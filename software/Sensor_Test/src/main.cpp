@@ -5,7 +5,7 @@ This is an example sketch for the Destination Weather FeatherWing remote sensing
 platform to test the SHT41 humidity & temperature sensor and the LPS22 pressure
 sensor.
 
-modified 2023-12-12
+modified 2023-12-17
 by Madison Gleydura
 
 MIT LICENSE AGREEMENT
