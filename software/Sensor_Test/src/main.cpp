@@ -8,7 +8,7 @@ sensor.
 modified 2023-12-12
 by Madison Gleydura
 
-LICENSE AGREEMENT
+MIT LICENSE AGREEMENT
 
 Copyright © 2023 Destination SPACE Inc.
 
