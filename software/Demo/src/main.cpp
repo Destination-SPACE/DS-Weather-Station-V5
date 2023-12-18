@@ -29,44 +29,187 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************/
 
-#include <Adafruit_GFX.h>
-#include <Adafruit_LPS2X.h>
-#include <Adafruit_NeoPixel.h>
-#include <Adafruit_Sensor.h>
-#include <Adafruit_SHT4x.h>
-#include <Adafruit_ST7789.h>
-#include <Adafruit_TinyUSB.h>
 #include <Arduino.h>
-#include <ArduinoJson.h>
-#include <SdFat.h>
-#include <SPI.h>
-#include <Wire.h>
-#include <YAMLDuino.h>
-
-#define LED LED_BUILTIN
-#define LPS22_INT 7
-#define SD_CS 5
-#define SD_CD 6
-#define NEO_PIXEL_FEATHER PIN_NEOPIXEL
-#define NEO_PIXEL_WING 10
-
-Adafruit_LPS22 LPS22;
-Adafruit_NeoPixel PIXEL_FEATHER(1, NEO_PIXEL_FEATHER);
-Adafruit_NeoPixel PIXEL_WING(1, NEO_PIXEL_WING, NEO_GRB + NEO_KHZ800);
-Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
-Adafruit_ST7789 TFT = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-Adafruit_USBD_MSC USB_MSC;
-
-SdFat SD;
-SdFile ROOT;
-SdFile FILE;
-
-bool FS_CHANGED;
+#include "setup.h"
 
 void setup() {
-  
+    //Setup Digitial IO
+    pinMode(BUTTON0, INPUT_PULLUP);
+    pinMode(BUTTON1, INPUT_PULLDOWN);
+    pinMode(BUTTON2, INPUT_PULLDOWN);
+    pinMode(LED, OUTPUT);
+
+    //Initialize core loops
+    xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
+    xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
+
+    PIXEL_FEATHER.begin(); // Initialize built-in NeoPixel
+    PIXEL_WING.begin(); // Initialize FeatherWing NeoPixel
+
+    USB_MSC.setID("DSPACE", "SD Card", "1.0");
+    USB_MSC.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
+    USB_MSC.setUnitReady(false);
+    USB_MSC.begin();
+
+    Serial.begin(115200);
+    Wire.begin();
+
+    if(SD_CD == HIGH){
+    Serial.print("\n\033[48;5;1mSD Card not Inserted\033[0m");
+        while(SD_CD == HIGH){
+            delay(10);
+        }
+    }
+
+    Serial.print("\nInitializing SD card ... ");
+
+    if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
+    Serial.print("\n\033[48;5;1mInitialization Failed\033[0m");
+        while(1){
+            delay(10);
+        }
+    }
+    
+    Serial.print("\n\nImporting config.yaml...");
+    const char* YAML_CONTENT = READ_YAML("/config.yaml");
+    Serial.print("\n\nYAML File Imported!\nDeserializing YAML Content...");
+    DESERIALIZE_YAML_TO_JSON_OBJECT(YAML_CONTENT);
+    Serial.print("\n\nYAML File Deserialized!");
+
+    Serial.print("\n\nInitializing Sensors...");
+    INITIALIZE_SENSORS(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700, REFRESH_RATE);
+    Serial.print("\nSensor Initialization Complete!");
+
+    Serial.print("\n\nInitializing TFT Display...");
+    INITIALIZE_TFT();
+    Serial.print("\n\nTFT Initialization Complete!");
+    float x = GET_SENSOR_DATA(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700);
+}
+
+void loop0(void * parameter){
+    for(;;){
+
+    }
+}
+
+void loop1(void * parameter){
+    for(;;){
+
+    }
 }
 
 void loop() {
   
+}
+
+const char* READ_YAML(const char* filename){
+    if(!FILE.open(filename)){
+        Serial.print("\nError opening file");
+
+        return "";
+    }
+
+    size_t size = FILE.fileSize();
+    char* buffer = (char*)malloc(size + 1);
+
+    if(!buffer){
+        Serial.print("\nMemory allocation failed");
+        FILE.close();
+
+        return "";
+    }
+
+    FILE.read(buffer, size);
+    buffer[size] = '\0';
+    FILE.close();
+
+    return buffer;
+
+}
+
+void DESERIALIZE_YAML_TO_JSON_OBJECT(const char* YAML_CONTENT){
+    StaticJsonDocument<2048> JSON_DOC;
+    JsonObject JSON_OBJECT = JSON_DOC.to<JsonObject>();
+    auto ERROR = deserializeYml(JSON_OBJECT, YAML_CONTENT);
+    if(ERROR){
+        Serial.printf("Unable to deserialize YAML to JsonObject: %s", ERROR.c_str() );
+
+        return;
+    }
+    
+    STUDENT_NAME = JSON_OBJECT["STUDENT_NAME"].as<const char*>();
+    REFRESH_RATE = JSON_OBJECT["REFRESH_RATE"].as<int>();
+
+    SSID = JSON_OBJECT["NETWORK"]["SSID"].as<const char*>();
+    PASSWORD = JSON_OBJECT["NETWORK"]["PASSWORD"].as<const char*>();
+
+    NEO_PIXEL_RGB = JSON_OBJECT["NEO_PIXEL"]["RGB"].as<bool>();
+    NEO_RED = JSON_OBJECT["NEO_PIXEL"]["RGB"]["RED"].as<int>();
+    NEO_GREEN = JSON_OBJECT["NEO_PIXEL"]["RGB"]["GREEN"].as<int>();
+    NEO_BLUE = JSON_OBJECT["NEO_PIXEL"]["RGB"]["BLUE"].as<int>();
+    NEO_BRIGHTNESS = JSON_OBJECT["NEO_PIXEL"]["RGB"]["BRIGHTNESS"].as<int>();
+    NEO_PIXEL_HSV = JSON_OBJECT["NEO_PIXEL"]["HSV"].as<bool>();
+    NEO_HUE = JSON_OBJECT["NEO_PIXEL"]["HSV"]["HUE"].as<int>();
+    NEO_SATURATION = JSON_OBJECT["NEO_PIXEL"]["HSV"]["SATURATION"].as<int>();
+    NEO_VALUE = JSON_OBJECT["NEO_PIXEL"]["HSV"]["VALUE"].as<int>();
+
+    UNITS_FEET = JSON_OBJECT["UNITS"]["ALTITUDE"]["FEET"].as<bool>();
+    UNITS_METERS = JSON_OBJECT["UNITS"]["ALTITUDE"]["METERS"].as<bool>();
+    UNITS_PASCAL = JSON_OBJECT["UNITS"]["PRESSURE"]["PASCAL"].as<bool>();
+    UNITS_MBAR = JSON_OBJECT["UNITS"]["PRESSURE"]["MBAR"].as<bool>();
+    UNITS_K_PASCAL = JSON_OBJECT["UNITS"]["PRESSURE"]["K_PASCAL"].as<bool>();
+    UNITS_IN_HG = JSON_OBJECT["UNITS"]["PRESSURE"]["IN_HG"].as<bool>();
+    UNITS_MM_HG = JSON_OBJECT["UNITS"]["PRESSURE"]["MM_HG"].as<bool>();
+    UNITS_PSI = JSON_OBJECT["UNITS"]["PRESSURE"]["PSI"].as<bool>();
+    UNITS_CELCIUS = JSON_OBJECT["UNITS"]["TEMPERATURE"]["CELCIUS"].as<bool>();
+    UNITS_FAHRENHEIT = JSON_OBJECT["UNITS"]["TEMPERATURE"]["FAHRENHEIT"].as<bool>();
+
+    SENSOR_ENS160 = JSON_OBJECT["SENSORS"]["ENS160"].as<bool>();
+    SENSOR_GUVA_B = JSON_OBJECT["SENSORS"]["GUVA_B"].as<bool>();
+    SENSOR_LPS22 = JSON_OBJECT["SENSORS"]["LPS22"].as<bool>();
+    SENSOR_LTR390 = JSON_OBJECT["SENSORS"]["LTR390"].as<bool>();
+    SENSOR_MAX17048 = JSON_OBJECT["SENSORS"]["MAX17048"].as<bool>();
+    SENSOR_SCD40 = JSON_OBJECT["SENSORS"]["SCD40"].as<bool>();
+    SENSOR_SHT41 = JSON_OBJECT["SENSORS"]["SHT41"].as<bool>();
+    SENSOR_VEML7700 = JSON_OBJECT["SENSORS"]["VEML7700"].as<bool>();
+}
+
+int32_t msc_read_cb (uint32_t lba, void* buffer, uint32_t bufsize){
+  bool rc;
+
+  #if SD_FAT_VERSION >= 20000
+    rc = SD.card()->readSectors(lba, (uint8_t*) buffer, bufsize/512);
+  #else
+    rc = SD.card()->readBlocks(lba, (uint8_t*) buffer, bufsize/512);
+  #endif
+
+  return rc ? bufsize : -1;
+}
+
+int32_t msc_write_cb (uint32_t lba, uint8_t* buffer, uint32_t bufsize){
+  bool rc;
+
+  digitalWrite(LED_BUILTIN, HIGH);
+
+  #if SD_FAT_VERSION >= 20000
+    rc = SD.card()->writeSectors(lba, buffer, bufsize/512);
+  #else
+    rc = SD.card()->writeBlocks(lba, buffer, bufsize/512);
+  #endif
+
+  return rc ? bufsize : -1;
+}
+
+void msc_flush_cb (void){
+  #if SD_FAT_VERSION >= 20000
+    SD.card()->syncDevice();
+  #else
+    sd.card()->syncBlocks();
+  #endif
+
+  SD.cacheClear();
+
+  FS_CHANGED = true;
+
+  digitalWrite(LED_BUILTIN, LOW);
 }

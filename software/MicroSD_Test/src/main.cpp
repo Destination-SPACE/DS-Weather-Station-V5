@@ -73,7 +73,7 @@ void setup()
 
   Serial.print("\nInitializing SD card ... ");
 
-  if(!sd.begin(, SD_SCK_MHZ(50))){
+  if(!sd.begin(CHIP_SELECT, SD_SCK_MHZ(50))){
     Serial.print("\n\033[48;5;1mInitialization Failed\033[0m");
     while(1){
       delay(10);

@@ -1,0 +1,49 @@
+{
+  "STUDENT_NAME": "12345678",
+  "REFRESH_RATE": 500,
+  "NETWORK": {
+    "SSID": "UNCA-Camp-Wifi",
+    "PASSWORD": "TheGreatSearchWithDigiKey"
+  },
+  "NEO_PIXEL": {
+    "RGB": {
+      "RED": 100,
+      "GREEN": 20,
+      "BLUE": 30,
+      "BRIGHTNESS": null
+    },
+    "HSV": {
+      "HUE": null,
+      "SATURATION": null,
+      "VALUE": null
+    }
+  },
+  "UNITS": {
+    "ALTITUDE": {
+      "FEET": false,
+      "METERS": true
+    },
+    "PRESSURE": {
+      "PASCAL": false,
+      "MBAR": true,
+      "K_PASCAL": false,
+      "IN_HG": false,
+      "MM_HG": false,
+      "PSI": false
+    },
+    "TEMPERATURE": {
+      "CELCIUS": true,
+      "FAHRENHEIT": false
+    }
+  },
+  "SENSORS": {
+    "ENS160": false,
+    "GUVA/B": false,
+    "LPS22": true,
+    "LTR390": false,
+    "MAX17048": false,
+    "SCD40": false,
+    "SHT41": false,
+    "VEML7700": false
+  }
+}
