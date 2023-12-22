@@ -47,7 +47,7 @@ void setup() {
   }
 
   char buffer[256];
-  sprintf(buffer, "\n\n+=================================================+\n|  Destination Weather FeatherWing Sensor Test  +\n+=================================================+");
+  sprintf(buffer, "\n\n+=================================================+\n|  Destination Weather FeatherWing Sensor Test    |\n+=================================================+");
   Serial.print(buffer);
 
   if(!LPS22.begin_I2C() && !SHT41.begin()) {

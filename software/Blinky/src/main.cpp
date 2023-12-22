@@ -19,13 +19,16 @@ void setup() {
 void loop() {
   PIXEL_BUILTIN.clear();
   PIXEL_WEATHER_WING.clear();
+  digitalWrite(led, LOW);
+
+  delay(DELAY_VALUE);
   
   PIXEL_BUILTIN.setPixelColor(0, PIXEL_BUILTIN.Color(0, 150, 0));
   PIXEL_WEATHER_WING.setPixelColor(0, PIXEL_WEATHER_WING.Color(0, 150, 0));
 
   digitalWrite(led, HIGH);
   PIXEL_BUILTIN.show();
-  PIXEL_WEATHER_WING.show();
+  PIXEL_WEATHER_WING.();
   
   delay(DELAY_VALUE);
 }
