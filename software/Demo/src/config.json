@@ -2,8 +2,8 @@
   "STUDENT_NAME": "12345678",
   "REFRESH_RATE": 500,
   "NETWORK": {
-    "SSID": "UNCA-Camp-Wifi",
-    "PASSWORD": "TheGreatSearchWithDigiKey"
+    "SSID": "123456789012",
+    "PASSWORD": "123456789012"
   },
   "NEO_PIXEL": {
     "RGB": {
