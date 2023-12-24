@@ -78,7 +78,7 @@ void setup() {
   SHT41.setPrecision(SHT4X_HIGH_PRECISION);
   SHT41.setHeater(SHT4X_NO_HEATER);
   
-  sprintf(buffer, "\n\n+=================================================+\n| Temperature (C) | Pressure (hPa) | Humidity (%) |\n+-----------------+----------------+--------------+");
+  sprintf(buffer, "\n\n+=================================================+\n| Temperature (C) | Pressure (hPa) | Humidity (%)  |\n+-----------------+----------------+--------------+");
   Serial.print(buffer);
 }
 

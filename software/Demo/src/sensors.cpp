@@ -89,52 +89,224 @@ void INITIALIZE_TFT(){
 
 float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22, bool SENSOR_LTR390, bool SENSOR_MAX17048, bool SENSOR_SCD40, bool SENSOR_SHT41, bool SENSOR_VEML7700){
     if(SENSOR_ENS160){
+        
+        ENS160_AQI = 0.0f;
+        ENS160_eCO2 = 0.0f;
+        ENS160_TVOC = 0.0f;
+        
         if(ENS160.available()){
             ENS160.measure(true);
             ENS160.measureRaw(true);
 
-            float ENS160_AQI = ENS160.getAQI();
-            float ENS160_eCO2 = ENS160.geteCO2();
-            float ENS160_HP0 = ENS160.getHP0();
-            float ENS160_HP1 = ENS160.getHP1();
-            float ENS160_HP2 = ENS160.getHP2();
-            float ENS160_HP3 = ENS160.getHP3();
-        }
-    }
-    if(SENSOR_GUVA_B){
+            //ENS160_AQI = ENS160.getAQI(); // algorythm from Umweltbundesamt – German Federal Environmental Agency
+            ENS160_eCO2 = ENS160.geteCO2(); //ppm
+            ENS160_TVOC = ENS160.getTVOC(); //ppb
 
-    }
-    if(SENSOR_LPS22){
-        sensors_event_t LPS22_TEMPERATURE, LPS22_PRESSURE;
-        LPS22.getEvent(&LPS22_PRESSURE, &LPS22_TEMPERATURE);
-    }
-    if(SENSOR_LTR390){
-        if(LTR390.newDataAvailable()){
-            float LTR390_RAW_UV = LTR390.readUVS();
-            float LTR390_UVI = LTR390_RAW_UV / 2300;
+            float TVOC_CONSENTRATION = ENS160_TVOC*(29/24.45); // ug/m^3
+
+            float alpha = 0.5; //Weight factor
+            ENS160_AQI = alpha*TVOC_CONSENTRATION + (1-alpha)*ENS160_AQI_PREV; //Calculated from NowCast algorithm
+
+            ENS160_AQI_PREV = ENS160_AQI;
+
+            return ENS160_AQI, ENS160_eCO2, ENS160_TVOC;
         }
+
+        return ENS160_AQI, ENS160_eCO2, ENS160_TVOC;
     }
+    else {
+        ENS160_AQI = 0.0f;
+        ENS160_eCO2 = 0.0f;
+        ENS160_TVOC = 0.0f;
+
+        return ENS160_AQI, ENS160_eCO2, ENS160_TVOC;
+    }
+
+    if(SENSOR_GUVA_B){
+        //Figure out how to read from ADC
+    }
+    else{
+        //Figure out how to read from ADC
+    }
+
+    if(SENSOR_LPS22){
+        sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN;
+        LPS22.getEvent(&LPS22_PRESSURE_SEN, &LPS22_TEMPERATURE_SEN);
+
+        LPS22_TEMPERATURE = LPS22_TEMPERATURE_SEN.temperature;
+
+        LPS22_PRESSURE = LPS22_PRESSURE_SEN.pressure;
+
+        LPS22_ALTITUDE = -(pow10(log10(LPS22_PRESSURE/101325)/5.2558797)-1)/(6.8755856*pow10(-6));
+
+        return LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE;
+    }
+    else{
+        LPS22_PRESSURE = 0.0f;
+        LPS22_TEMPERATURE = 0.0f;
+
+        return LPS22_PRESSURE, LPS22_TEMPERATURE;
+    }
+
+    if(SENSOR_LTR390){
+        LTR390_RAW_UV = 0.0f;
+        LTR390_UVI = 0.0f;
+
+        if(LTR390.newDataAvailable()){
+            LTR390_RAW_UV = LTR390.readUVS();
+            LTR390_UVI = LTR390_RAW_UV / 2300.00;
+
+            return LTR390_RAW_UV, LTR390_UVI;
+        }
+
+        return LTR390_RAW_UV, LTR390_UVI;
+    }
+    else{
+        LTR390_RAW_UV = 0.0f;
+        LTR390_UVI = 0.0f;
+
+        return LTR390_RAW_UV, LTR390_UVI;
+    }
+
     if(SENSOR_MAX17048){
-        float MAX17048_VOLTAGE = MAX17048.cellVoltage();
-        float MAX17048_PERCENTAGE = MAX17048.cellPercent();
-        float MAX17048_CHARGE_RATE = MAX17048.chargeRate();
+        MAX17048_VOLTAGE = MAX17048.cellVoltage();
+        MAX17048_PERCENTAGE = MAX17048.cellPercent();
+        MAX17048_CHARGE_RATE = MAX17048.chargeRate();
+
+        return MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE;
     }
+    else{
+        MAX17048_CHARGE_RATE = 0.0f;
+        MAX17048_PERCENTAGE = 0.0f;
+        MAX17048_VOLTAGE = 0.0f;
+
+        return MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE;
+    }
+
     if(SENSOR_SCD40){
         bool isDataReady = false;
+
+        SCD40_CO2 = 0.0f;
+        SCD40_HUMIDITY = 0.0f;
+        SCD40_TEMPERATURE = 0.0f;
+
         if(!SCD40.getDataReadyFlag(isDataReady)){
             uint16_t SCD40_CO2;
-            float SCD40_TEMPERATURE, SCD40_HUMIDITY;
             uint16_t error = SCD40.readMeasurement(SCD40_CO2, SCD40_TEMPERATURE, SCD40_HUMIDITY);
-            if(error){
-                float SCD40_CO2 = 0;
-                float SCD40_TEMPERATURE = 0;
-                float SCD40_HUMIDITY = 0;
-            }
-            else{
+            if(!error){
                 float SCD40_CO2;
-                float SCD40_TEMPERATURE;
                 float SCD40_HUMIDITY;
+                float SCD40_TEMPERATURE;
+                
+                return SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE;
             }
+
+            return SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE;
         }
+
+        return SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE;
     }
+    else{
+        SCD40_CO2 = 0.0f;
+        SCD40_HUMIDITY = 0.0f;
+        SCD40_TEMPERATURE = 0.0f;
+
+        return SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE;
+    }
+
+    if(SENSOR_SHT41){
+        sensors_event_t SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
+        SHT41.getEvent(&SHT41_HUMIDITY_SEN, &SHT41_TEMPERATURE_SEN);
+
+        SHT41_HUMIDITY = SHT41_HUMIDITY_SEN.relative_humidity;
+        SHT41_TEMPERATURE = SHT41_TEMPERATURE_SEN.temperature;
+
+        float h = (log10(SHT41_HUMIDITY)-2.0)/0.4343+(17.62*SHT41_TEMPERATURE)/(243.12+SHT41_TEMPERATURE);
+        float SHT41_DEW_POINT = 243.12*h/(17.62-h);
+
+        float SHT41_ABSOLUTE_HUMIDITY = 216.7*(SHT41_HUMIDITY/100.0*6.112*exp(17.62*SHT41_TEMPERATURE/(243.12+SHT41_TEMPERATURE))/(275.15+SHT41_TEMPERATURE));
+
+        float SHT41_HEAT_INDEX = 1.1*SHT41_TEMPERATURE + 5*(0.047*SHT41_HUMIDITY - 7.1)/9;
+        if((SHT41_HEAT_INDEX+SHT41_TEMPERATURE)/2 >= 26.7){
+            SHT41_HEAT_INDEX = -8.78469475556 + 1.61139411*SHT41_TEMPERATURE + 2.33854883889*SHT41_HUMIDITY - 0.14611605*SHT41_TEMPERATURE*SHT41_HUMIDITY + 0.012308094*SHT41_TEMPERATURE*SHT41_TEMPERATURE - 0.0164248277778*SHT41_HUMIDITY*SHT41_HUMIDITY + 0.002211732*SHT41_TEMPERATURE*SHT41_TEMPERATURE*SHT41_HUMIDITY + 0.00072546*SHT41_TEMPERATURE*SHT41_HUMIDITY*SHT41_HUMIDITY - 0.000003582*SHT41_TEMPERATURE*SHT41_TEMPERATURE*SHT41_HUMIDITY*SHT41_HUMIDITY;
+            
+            if(SHT41_HUMIDITY < 13 && SHT41_TEMPERATURE > 26.7 && SHT41_TEMPERATURE < 44.4){
+                SHT41_HEAT_INDEX = SHT41_HEAT_INDEX + (5/36)*(SHT41_HUMIDITY-13)*sqrt((17-abs(1.8*SHT41_TEMPERATURE-63))/17)-160/9;
+
+                return SHT41_HEAT_INDEX;
+            }
+            else if(SHT41_HUMIDITY > 85 && SHT41_TEMPERATURE > 26.7 && SHT41_TEMPERATURE < 30.6){
+                SHT41_HEAT_INDEX = SHT41_HEAT_INDEX + 5*(SHT41_HUMIDITY-85)*(55-1.8*SHT41_TEMPERATURE)/450-160/9;
+
+                return SHT41_HEAT_INDEX;
+            }
+
+            return SHT41_HEAT_INDEX;
+        }
+
+        return SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX, SHT41_TEMPERATURE;
+    }
+    else{
+        SHT41_HUMIDITY = 0.0f;
+        SHT41_TEMPERATURE = 0.0f;
+        SHT41_ABSOLUTE_HUMIDITY = 0.0f;
+        SHT41_HEAT_INDEX = 0.0f;
+
+        return SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX, SHT41_TEMPERATURE;
+    }
+
+    if(SENSOR_VEML7700){
+        VEML7700_LUX = VEML7700.readLux(VEML_LUX_AUTO);
+
+        return VEML7700_LUX;
+    }
+    else{
+        VEML7700_LUX = 0.0f;
+
+        return VEML7700_LUX;
+    }
+
+    //Unit conversions
+    if(UNITS_FEET){
+        LPS22_ALTITUDE = LPS22_ALTITUDE * 0.0254/12;
+
+        return LPS22_ALTITUDE;
+    }
+
+    if(UNITS_MBAR){
+        LPS22_PRESSURE = LPS22_PRESSURE * 0.01;
+
+        return LPS22_PRESSURE;
+    }
+    else if(UNITS_K_PASCAL){
+        LPS22_PRESSURE = LPS22_PRESSURE * 0.001;
+
+        return LPS22_PRESSURE;
+    }
+    else if(UNITS_IN_HG){
+        LPS22_PRESSURE = LPS22_PRESSURE * 0.0002953;
+
+        return LPS22_PRESSURE;
+    }
+    else if(UNITS_MM_HG){
+        LPS22_PRESSURE = LPS22_PRESSURE * 0.007500616;
+
+        return LPS22_PRESSURE;
+    }
+    else if(UNITS_PSI){
+        LPS22_PRESSURE = LPS22_PRESSURE * 0.000145038;
+
+        return LPS22_PRESSURE;
+    }
+    else{}
+
+    if(UNITS_FAHRENHEIT){
+        LPS22_TEMPERATURE*(9/5)+32;
+        SCD40_TEMPERATURE*(9/5)+32;
+        SHT41_TEMPERATURE*(9/5)+32;
+
+        return LPS22_TEMPERATURE, SCD40_TEMPERATURE, SHT41_TEMPERATURE;
+    }
+
+    return ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX, SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX;
 }
