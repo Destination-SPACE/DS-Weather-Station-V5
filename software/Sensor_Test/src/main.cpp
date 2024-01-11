@@ -39,6 +39,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Adafruit_LPS22 LPS22;
 Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
 
+sensor_id
+
 void setup() {
   Serial.print(115200);
   
@@ -49,6 +51,8 @@ void setup() {
   char buffer[256];
   sprintf(buffer, "\n\n+=================================================+\n|  Destination Weather FeatherWing Sensor Test    |\n+=================================================+");
   Serial.print(buffer);
+
+  LPS22.begin_I2C(LPS2X_I2CADDR_DEFAULT)
 
   if(!LPS22.begin_I2C() && !SHT41.begin()) {
     Serial.print("\n\033[48;5;1mCouldn't find LPS22\033[0m");

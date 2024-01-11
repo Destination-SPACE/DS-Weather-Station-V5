@@ -41,7 +41,7 @@ void setup() {
 
     //Initialize core loops
     xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
-    xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
+    xTaskCreatePinnedToCore(loop1, "Task0", 1000, NULL, 0, &Task1, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
 
     PIXEL_FEATHER.begin(); // Initialize built-in NeoPixel
     PIXEL_WING.begin(); // Initialize FeatherWing NeoPixel
@@ -83,12 +83,24 @@ void setup() {
     Serial.print("\n\nInitializing TFT Display...");
     INITIALIZE_TFT();
     Serial.print("\n\nTFT Initialization Complete!");
+    Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+");
 }
 
 void loop0(void * parameter){
     for(;;){
+      int time_prev = millis();
       ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX = GET_SENSOR_DATA(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700);
+      
+      char buffer[1024];
 
+      sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %3.0f | %4.0f | %5.1f | %5.2f |%7.3f|", SHT41_TEMPERATURE, SHT41_HUMIDITY, LPS22_PRESSURE, LPS22_ALTITUDE, SCD40_CO2, ENS160_TVOC, ENS160_AQI, LTR390_UVI, VEML7700_LUX);
+
+      Serial.print(buffer);
+
+      while(true){
+        if(millis() - time_prev >= 1000) break;
+        delay(5);
+      }
       
     }
 }
@@ -104,25 +116,25 @@ void loop() {
 }
 
 const char* READ_YAML(const char* filename){
-    if(!FILE.open(filename)){
+    if(!file.open(filename)){
         Serial.print("\nError opening file");
 
         return "";
     }
 
-    size_t size = FILE.fileSize();
+    size_t size = file.fileSize();
     char* buffer = (char*)malloc(size + 1);
 
     if(!buffer){
         Serial.print("\nMemory allocation failed");
-        FILE.close();
+        file.close();
 
         return "";
     }
 
-    FILE.read(buffer, size);
+    file.read(buffer, size);
     buffer[size] = '\0';
-    FILE.close();
+    file.close();
 
     return buffer;
 
