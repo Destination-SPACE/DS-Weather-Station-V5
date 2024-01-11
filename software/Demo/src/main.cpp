@@ -40,16 +40,16 @@ void setup() {
     pinMode(LED, OUTPUT);
 
     //Initialize core loops
-    xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
-    xTaskCreatePinnedToCore(loop1, "Task0", 1000, NULL, 0, &Task1, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
+    //xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
+    //xTaskCreatePinnedToCore(loop1, "Task0", 1000, NULL, 0, &Task1, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
 
     PIXEL_FEATHER.begin(); // Initialize built-in NeoPixel
     PIXEL_WING.begin(); // Initialize FeatherWing NeoPixel
 
-    USB_MSC.setID("DSPACE", "SD Card", "1.0");
-    USB_MSC.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
-    USB_MSC.setUnitReady(false);
-    USB_MSC.begin();
+    //USB_MSC.setID("DSPACE", "SD Card", "1.0");
+    //USB_MSC.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
+    //USB_MSC.setUnitReady(false);
+    //USB_MSC.begin();
 
     Serial.begin(115200);
     Wire.begin();
@@ -63,18 +63,18 @@ void setup() {
 
     Serial.print("\nInitializing SD card ... ");
 
-    if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
+    /*if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
     Serial.print("\n\033[48;5;1mInitialization Failed\033[0m");
         while(1){
             delay(10);
         }
-    }
+    }*/
     
-    Serial.print("\n\nImporting config.yaml...");
-    const char* YAML_CONTENT = READ_YAML("/config.yaml");
-    Serial.print("\n\nYAML File Imported!\nDeserializing YAML Content...");
-    DESERIALIZE_YAML_TO_JSON_OBJECT(YAML_CONTENT);
-    Serial.print("\n\nYAML File Deserialized!");
+    //Serial.print("\n\nImporting config.yaml...");
+    //const char* YAML_CONTENT = READ_YAML("/config.yaml");
+    //Serial.print("\n\nYAML File Imported!\nDeserializing YAML Content...");
+    //DESERIALIZE_YAML_TO_JSON_OBJECT(YAML_CONTENT);
+    //Serial.print("\n\nYAML File Deserialized!");
 
     Serial.print("\n\nInitializing Sensors...");
     INITIALIZE_SENSORS(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700, REFRESH_RATE);
@@ -86,7 +86,7 @@ void setup() {
     Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+");
 }
 
-void loop0(void * parameter){
+/*void loop0(void * parameter){
     for(;;){
       int time_prev = millis();
       ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX = GET_SENSOR_DATA(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700);
@@ -109,13 +109,25 @@ void loop1(void * parameter){
     for(;;){
 
     }
-}
+}*/
 
 void loop() {
-  
+  int time_prev = millis();
+  ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX = GET_SENSOR_DATA(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700);
+      
+  char buffer[1024];
+
+  sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %3.0f | %4.0f | %5.1f | %5.2f |%7.3f|", SHT41_TEMPERATURE, SHT41_HUMIDITY, LPS22_PRESSURE, LPS22_ALTITUDE, SCD40_CO2, ENS160_TVOC, ENS160_AQI, LTR390_UVI, VEML7700_LUX);
+
+  Serial.print(buffer);
+
+  while(true){
+    if(millis() - time_prev >= 1000) break;
+    delay(5);
+  }
 }
 
-const char* READ_YAML(const char* filename){
+/*const char* READ_YAML(const char* filename){
     if(!file.open(filename)){
         Serial.print("\nError opening file");
 
@@ -225,4 +237,4 @@ void msc_flush_cb (void){
   FS_CHANGED = true;
 
   digitalWrite(LED_BUILTIN, LOW);
-}
+}*/

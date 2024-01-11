@@ -10,13 +10,12 @@
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_ST7789.h>
-#include <Adafruit_TinyUSB.h>
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <SdFat.h>
+//#include <Adafruit_TinyUSB.h>
+//#include <ArduinoJson.h>
+//#include <SdFat.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <YAMLDuino.h>
+//#include <YAMLDuino.h>
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
@@ -43,11 +42,11 @@
 Adafruit_NeoPixel PIXEL_FEATHER(1, NEO_PIXEL_FEATHER);
 Adafruit_NeoPixel PIXEL_WING(1, NEO_PIXEL_WING, NEO_GRB + NEO_KHZ800);
 Adafruit_ST7789 TFT = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-Adafruit_USBD_MSC USB_MSC;
+//Adafruit_USBD_MSC USB_MSC;
 
 //Declare core tasks
-TaskHandle_t Task0, Task1;
-SemaphoreHandle_t baton;
+//TaskHandle_t Task0, Task1;
+//SemaphoreHandle_t baton;
 
 //Declare sensors
 ScioSense_ENS160 ENS160(ENS160_I2CADDR_1);
@@ -59,10 +58,10 @@ Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
 Adafruit_VEML7700 VEML7700 = Adafruit_VEML7700();
 
 
-SdFat SD;
-SdFile file;
+//SdFat SD;
+//SdFile file;
 
-bool FS_CHANGED;
+//bool FS_CHANGED;
 
 //Set variable types for functions
 void INITIALIZE_SENSORS(bool, bool, bool, bool, bool, bool, bool, bool, int);
@@ -72,12 +71,12 @@ void loop1(void * parameter);
 
 float GET_SENSOR_DATA(bool, bool, bool, bool, bool, bool, bool, bool);
 
-int32_t msc_read_cb(uint32_t, void*, uint32_t);
-int32_t msc_write_cb(uint32_t, uint8_t*, uint32_t);
-void msc_flush_cb();
+//int32_t msc_read_cb(uint32_t, void*, uint32_t);
+//int32_t msc_write_cb(uint32_t, uint8_t*, uint32_t);
+//void msc_flush_cb();
 
-const char* READ_YAML(const char*);
-void DESERIALIZE_YAML_TO_JSON_OBJECT(const char*);
+//const char* READ_YAML(const char*);
+//void DESERIALIZE_YAML_TO_JSON_OBJECT(const char*);
 
 
 //Set YAML variable types
