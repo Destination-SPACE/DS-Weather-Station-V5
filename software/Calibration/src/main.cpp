@@ -2,11 +2,17 @@
 #include <Adafruit_LPS2X.h>
 #include <Adafruit_SHT4x.h>
 #include <Adafruit_Sensor.h>
-#include <EEPROM.h>
 #include <Wire.h>
 
 Adafruit_LPS22 LPS22;
 Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
+
+//EEPROM Instructions
+#define EEPROM_SCIO 13 //device GPIO
+uint8_t EEPROM_READ = 0x3C;
+uint8_t EEPROM_CCRD = 0x06;
+uint8_t EEPROM_WRITE = 0x6C;
+uint8_t EEPROM_WREN = 0x96;
 
 #define SHT_CAL_TEMP_MSB_ADDR 0
 #define SHT_CAL_TEMP_LSB_ADDR 1
@@ -36,7 +42,6 @@ void setup() {
     SHT41.setPrecision(SHT4X_HIGH_PRECISION);
     SHT41.setHeater(SHT4X_NO_HEATER);
   }
-  EEPROM.begin(4);
 
   Serial.print("\n\nType 'help' for a list of commands");
 }
