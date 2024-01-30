@@ -13,9 +13,6 @@
         <ul>
         <li><a href="#step-1">Step 1</a></li>
         <li><a href="#step-2">Step 2</a></li>
-        <li><a href="#step-3">Step 3</a></li>
-        <li><a href="#step-4">Step 4</a></li>
-        <li><a href="#step-5">Step 5</a></li>
         </ul>
     </details>
     <li><a href="#final-assembly">Final Assembly</a></li>
@@ -94,34 +91,20 @@
 ### 🔧 Soldering
 
 #### Step 1:
-- Take 2 1x7 male header pins and insert the long side of the pins into the board
+- Find the 1x16 and 1x12 socket headers and the Adafruit ESP32-S3 Reverse TFT Feather board
+- Insert the two headers onto the Feather board so that when it is laying flat on the screen, the header sockets are pointing up
 - Carefully flip the board upside-down, without letting the headers fall out
-- Place the tip of the soldering iron at the corner between the 1st pin and the gold pad, allowing it to heat up the board for 2-3 seconds
-- Feed solder onto the pad with your other hand. The solder should melt and flow around the pad and pin.
+- Place the tip of the soldering iron at the corner between the 1st pin on the 1x16 row and the gold pad, allowing it to heat up the board for 2-3 seconds
+- Feed solder onto the pad with your other hand. The solder should melt and flow around the pad and pin
 - Remove the soldering iron after 2-3 more seconds
-- Repeat with the 7th pin, then the other pins in the middle
-- Repeat with the other 1x7 header
+- Repeat with the first pin on the 1x12 row
+- Flip the board over and check to see if the headers are parallel to each other
+- If they are, Repeat with the 16th pin on the 1x16 row and the 12th pin on the 1x12 row
+- Repeat on the remaining pins for each row
 
 #### Step 2:
-- Following the same steps above, solder the 1x4 header to the board
-
-#### Step 3:
-- Place the Seeeduino XIAO RP2040 on the 1x7 headers, with the USB C port and buttons facing up
-- Following the same soldering techniques, solder all 14 pins on the XIAO
-
-#### Step 4:
-- Place the OLED display on the 1x4 header with the screen facing up
-- Solder the first pin using the same technique used for the other pins
-- Before soldering the other pins, hold the screen with one hand, and heat up the soldered pad
-- Adjust the screen so it is flat with the weather station board
-- Solder the 4th pin, then the 2 middle pins
-
-#### Step 5:
-- Insert the SPDT switch into the weather station board
-- Carefully flip the board upside-down, without letting the button fall out
-- Using the same technique as before, solder the 2 outside pins of the switch, then solder the 3 middle pins
+- Following the same steps above, solder the short side of the 1x16 and 1x12 pin headers to the Weather FeatherWing
 
 ### Final Assembly
-- Insert the AAA batteries into the battery case
+- Stack the Weather FeatherWing ontop of the Feather board
 - Insert the microSD card into the weather station
-- Write your name on the back of the weather station in the white box provided
