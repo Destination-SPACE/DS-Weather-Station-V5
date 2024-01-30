@@ -13,7 +13,7 @@ This kit includes all the nessisary components to get started with the Destinati
 ### 🤖 Microcontroller
 - Adafruit ESP32-S3 Reverse TFT Feather
 ### 💾 Storage
-- ejectable microSD card socket
+- Ejectable microSD card socket
 ### ⚡ Power
 - 2-pin JST-PH connector for 1s Lithium Polymer Ion batteries and charger
 - SPDT slide switch
