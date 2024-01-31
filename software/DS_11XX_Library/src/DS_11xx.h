@@ -1,7 +1,12 @@
+//#ifdef
+
 #include <Arduino.h>
+#include <esp32-hal-timer.h>
+
+#define EEPROM_PIN 10   // Set the EEPROM GPIO to digital pin 10
 
 //Instruction Commands
-Byte READ = 0x03;       // Read data from memory array beginning at specified address
+uint8_t READ = 0x03;    // Read data from memory array beginning at specified address
 uint8_t CRRD = 0x06;    // Read data from current location in memory array
 uint8_t WRITE = 0x6C;   // Write data to memory array begining at specified address
 uint8_t WREN = 0x96;    // Set the write enable latch (enable write operations)
@@ -19,7 +24,7 @@ int T_SS = 10;          // Start header setup time
 int T_HDR = 5;          // Start header low pulse time
 int T_SP = 0;           // Input filter spike suppression (SCIO)
 int T_WC_WRSR = 5000;   // Write cycle time (Write, WRSR commands)
-int T_WC_ERAL = 10000;  // Write cycle time (ERAU, SETAL commands)
+int T_WC_ERAL = 10000;  // Write cycle time (ERAL, SETAL commands)
 
 //Data Transfer Codes
 uint8_t ST_HDR = 0x55;  // Start header
@@ -27,10 +32,16 @@ bool MAK = 1;           // Master acknowlege bit
 bool noMAK = 0;         // Master non-acknowlege bit (used to terminate current operation)
 bool SAK;               // Slave acknowlege bit
 
+//Timer Definitions
+hw_timer_t *timer = NULL;
+volatile bool transmitBit = false;
+volatile bool reading = false;
+volatile bool receivedBit = false;
+
 class PROM
 {
     public:
-        void begin(uint8_t T_E);    // Set bit-period
+        void begin(int);    // Set bit-period
 
 
         void setAddress(uint8_t addr);  // Define the slave address of the EEPROM
@@ -48,4 +59,9 @@ class PROM
         void eraseAll(void);    // Write '0x00' to the entire memory array
         void setAll(void);      // Write '0xFF' to the entire memory array
 
-}
+    private:
+
+
+};
+
+#endif
