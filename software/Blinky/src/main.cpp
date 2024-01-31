@@ -28,7 +28,7 @@ void loop() {
 
   digitalWrite(led, HIGH);
   PIXEL_BUILTIN.show();
-  PIXEL_WEATHER_WING.();
+  PIXEL_WEATHER_WING.show();
   
   delay(DELAY_VALUE);
 }
