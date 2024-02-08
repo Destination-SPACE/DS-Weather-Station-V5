@@ -28,11 +28,21 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************/
-
-#include <Arduino.h>
 #include "setup.h"
 
+int REFRESH_RATE = 0.05; //Seconds
+float ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX;
+
+//Declare system components
+Adafruit_NeoPixel PIXEL_FEATHER(1, NEO_PIXEL_FEATHER);
+Adafruit_NeoPixel PIXEL_WING(1, NEO_PIXEL_WING, NEO_GRB + NEO_KHZ800);
+
 void setup() {
+  Serial.begin(115200);
+  while(!Serial){
+    delay(10);
+  }
+
     //Setup Digitial IO
     pinMode(BUTTON0, INPUT_PULLUP);
     pinMode(BUTTON1, INPUT_PULLDOWN);
@@ -51,15 +61,15 @@ void setup() {
     //USB_MSC.setUnitReady(false);
     //USB_MSC.begin();
 
-    Serial.begin(115200);
+    
     Wire.begin();
 
-    if(SD_CD == HIGH){
+    /*if(SD_CD == HIGH){
     Serial.print("\n\033[48;5;1mSD Card not Inserted\033[0m");
         while(SD_CD == HIGH){
             delay(10);
         }
-    }
+    }*/
 
     Serial.print("\nInitializing SD card ... ");
 

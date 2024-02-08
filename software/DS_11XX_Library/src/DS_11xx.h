@@ -3,7 +3,8 @@
 #include <Arduino.h>
 #include <esp32-hal-timer.h>
 
-#define EEPROM_PIN 10   // Set the EEPROM GPIO to digital pin 10
+#define EEPROM_PIN 10       // Set the EEPROM GPIO to digital pin 10
+#define EEPROM_ADDR 0x0A    // Default address for the EEPROM (0xA1 alternate)
 
 //Instruction Commands
 uint8_t READ = 0x03;    // Read data from memory array beginning at specified address
@@ -60,6 +61,14 @@ class PROM
         void setAll(void);      // Write '0xFF' to the entire memory array
 
     private:
+        uint8_t receiveData(void);          // Read data from the data line
+        void transmitByte(uint8_t data);    // Transmit data on the data line
+
+        void standbyPulse(void);            // Transmit a standby pulse
+        void startHeader(void);             // Transmit the start header
+        bool acknowledge(bool ack);         // Send an acknowlegment bit
+        void sendDeviceAddress(void);       // Send the device address
+        void sendCommand(uint8_t cmd);      // Send command to the EEPROM
 
 
 };
