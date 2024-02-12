@@ -1,22 +1,52 @@
 #include <Arduino.h>
-#include <SPI.h>
-#include <SPIFFS.h>
 #include <WiFi.h>
 #include <WebServer.h>
 
-const char *esp_ssid = "DS-WX-046589";  // Weather Station's SSID
-const char *esp_password = "password";  // Weather Station's Password
+const char* ssid = "DS-WX-4843";
+const char* password = "password";
 
-bool formSubmit;
-String ssid, password;
+String savedSSID;
+String savedPassword;
+bool saved = false;
 
-void handleRoot();
-String handleFormSubmission();
+WebServer server(80);
 
-IPAddress ip(192,168,4,1);          // IP address
-IPAddress subnet(255, 255, 255, 0); // Subnet mask
+void handleRoot() {
+  // Send HTML content as response
+  server.send(200, "text/html",
+    "<!DOCTYPE html>\
+    <html>\
+      <head>\
+        <meta charset='UTF-8'>\
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>\
+        <title>Wi-Fi Configuration</title>\
+      </head>\
+      <body>\
+        <h1>Enter Wi-Fi Credentials</h1>\
+        <form action='/save' method='post'>\
+          <label for='ssid'>SSID:</label><br>\
+          <input type='text' id='ssid' name='ssid'><br>\
+          <label for='password'>Password:</label><br>\
+          <input type='password' id='password' name='password'><br><br>\
+          <input type='submit' value='Submit'>\
+        </form>\
+      </body>\
+    </html>"
+  );
+}
 
-WebServer server(80);  // Port 80
+void handleFormSubmission() {
+  // Retrieve form parameters
+  savedSSID = server.arg("ssid");
+  savedPassword = server.arg("password");
+  saved = true;
+
+  // Do something with the credentials (e.g., save to EEPROM)
+  // This is where you would save the credentials to NVM
+
+  // Send response
+  server.send(200, "text/plain", "Credentials saved.");
+}
 
 void setup() {
   Serial.begin(115200);
@@ -24,54 +54,27 @@ void setup() {
   while(!Serial){
     delay(10);
   }
-  
 
-  if(!SPIFFS.begin(true)){
-    Serial.println("An error occured while mounting SPIFFS");
-    return;
-  }
-
-  WiFi.softAPConfig(ip, ip, subnet);
-  WiFi.softAP(esp_ssid, esp_password);
+  WiFi.softAP(ssid, password);
 
   IPAddress apIP = WiFi.softAPIP();
 
   server.on("/", HTTP_GET, handleRoot);
   server.on("/save", HTTP_POST, handleFormSubmission);
-  server.begin();
 
-  Serial.print("\n\nHTTP server started\n");
-  Serial.print(apIP);
+  server.begin();
+  Serial.println("HTTP server started");
+  Serial.println(apIP);
 }
 
 void loop() {
   server.handleClient();
-  if(formSubmit){
-    Serial.print("SSID: ");
-    Serial.println(ssid);
-    Serial.print("PASS: ");
-    Serial.print(password);
+
+  if(saved){
+    Serial.println(savedSSID);
+    Serial.println(savedPassword);
+    while(true){
+      delay(10);
+    }
   }
-}
-
-void handleRoot(){
-  File file = SPIFFS.open("/network-config.html","r");
-  if(file){
-    server.streamFile(file, "text/html");
-    file.close();
-  }
-  else{
-    server.send(404, "text/plain", "network-config.html not found");
-  }
-}
-
-String handleFormSubmission(){
-  ssid = server.arg("ssid");
-  password = server.arg("password");
-
-  formSubmit = true;
-
-  server.send(200, "text/plain", "Credentials saved");
-
-  return ssid, password;
 }
