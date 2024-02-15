@@ -11,31 +11,37 @@
 Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
 Adafruit_LPS22 LPS22;
 
-const char* ssid = "DS-WX-STN-1";
+const char* ssid = "DS-WX-STN-01";
 const char* password = "password";
 
+uint32_t tempData, humdData, presData;
+uint32_t dataTemp, dataHumd, dataPres;
 
 AsyncWebServer server(80);
 
-std::string readTemp(){
-  sensors_event_t humidity, temp;
-  SHT41.getEvent(&humidity, &temp);
+uint32_t getTemperature(){
+  sensors_event_t shtHumidity, shtTemperature;
+  SHT41.getEvent(&shtHumidity, &shtTemperature);
+  tempData = shtTemperature.temperature;
 
-  return std::to_string(temp.temperature);
+  return tempData;
 }
 
-std::string readHumidity(){
-  sensors_event_t humidity, temp;
-  SHT41.getEvent(&humidity, &temp);
+uint32_t getHumidity(){
+  sensors_event_t shtHumidity, shtTemperature;
+  SHT41.getEvent(&shtHumidity, &shtTemperature);
+  humdData = shtHumidity.relative_humidity;
 
-  return std::to_string(humidity.relative_humidity);
+  return humdData;
 }
 
-std::string readPressure(){
-  sensors_event_t temp, pressure;
-  LPS22.getEvent(&pressure, &temp);
 
-  return std::to_string(pressure.pressure);
+uint32_t getPressure(){
+  sensors_event_t lpsPressure, lpsTemperature;
+  LPS22.getEvent(&lpsPressure, &lpsTemperature);
+  presData = lpsPressure.pressure;
+
+  return presData;
 }
 
 void setup() {
@@ -67,16 +73,26 @@ void setup() {
   Serial.print(IP);
 
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "test/plain", readTemp().c_str());
+    dataTemp = getTemperature();
+    char tempSend[16];
+    dtostrf(dataTemp, 4, 2, tempSend);
+
+    request->send_P(200, "test/plain", tempSend);
   });
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "test/plain", readHumidity().c_str());
+    dataHumd = getHumidity();
+    char humdSend[16];
+    dtostrf(dataHumd, 4, 2, humdSend);
+    request->send_P(200, "test/plain", humdSend);
   });
   server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "test/plain", readPressure().c_str());
+    dataPres = getPressure();
+    char presSend[16];
+    dtostrf(dataPres, 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
   });
 
-  server.begin();  
+  server.begin();
 }
 
 void loop() {

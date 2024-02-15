@@ -5,16 +5,18 @@
 const char* ssid = "DS-WX-STN-01";
 const char* password = "password";
 
-const char* serverTemp = "http://192.168.4.1/temperature";
-const char* serverHumd = "http://192.168.4.1/humidity";
-const char* serverPres = "http://192.168.4.1/pressure";
-
-std::string temperature, humidity, pressure;
-std::string httpGetRequest(const char*);
+const char* temperature_server = "http://192.168.4.1/temperature";
+const char* humidity_server = "http://192.168.4.1/humidity";
+const char* pressure_server = "http://192.168.4.1/pressure";
 
 unsigned long previousMillis = 0;
 const long interval = 5000;
 
+String temperature;
+String humidity;
+String pressure;
+
+String HTTP_Request(const char*);
 
 void setup() {
   Serial.begin(115200);
@@ -33,42 +35,41 @@ void setup() {
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-  if(currentMillis - previousMillis >= interval){
-    if(WiFi.status() == WL_CONNECTED){
-      temperature = httpGetRequest(serverTemp);
-      humidity = httpGetRequest(serverHumd);
-      pressure = httpGetRequest(serverPres);
-      
-      char buffer[256];
-      sprintf(buffer, "\nTemperature:\t%s*C\nHumidity:\t%s%\nPressure:\t%shPa\n", temperature, humidity, pressure);
+  unsigned long current_time = millis();
+  if(current_time - previousMillis >= interval) {
+    if(WiFi.status()== WL_CONNECTED ){
+      int rssi = WiFi.RSSI();
+      temperature = HTTP_Request(temperature_server);
+      humidity = HTTP_Request(humidity_server);
+      pressure = HTTP_Request(pressure_server);
+      char buffer[128];
+      sprintf(buffer, "\nTemperature:\t%s*C\nHumidity:\t%s%\nPressure:\t%shPa\nRSSI:\t\t%ddBm\n", temperature, humidity, pressure);
       Serial.print(buffer);
-
-      previousMillis = currentMillis;
+      previousMillis = current_time;
     }
     else{
-      Serial.print("\nWiFi Disconnected");
+      Serial.println("WiFi got disconnected!");
     }
   }
 }
 
-std::string httpGetRequest(const char* serverName) {
+String HTTP_Request(const char* server_name) {
+  WiFiClient client;
   HTTPClient http;
-  http.begin(serverName);
+  http.begin(client, server_name);
   int httpResponseCode = http.GET();
-
-  std::string payload = "--";
-
-  if(httpResponseCode > 0){
-    Serial.print("\nHTTP Response Code: ");
-    Serial.print(httpResponseCode);
-    payload = std::string(http.getString().c_str());
+  
+  String payload = "--"; 
+  
+  if (httpResponseCode>0) {
+    //Serial.print("HTTP Response code: ");
+    //Serial.println(httpResponseCode);
+    payload = http.getString();
   }
-  else{
-    Serial.print("\nError Code: ");
-    Serial.print(httpResponseCode);
+  else {
+    Serial.print("Error code: ");
+    Serial.println(httpResponseCode);
   }
-
   http.end();
 
   return payload;
