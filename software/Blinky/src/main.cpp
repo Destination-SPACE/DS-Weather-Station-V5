@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 
+
 #define NEO_PIXEL_DEFAULT PIN_NEOPIXEL
 #define NEO_PIXEL_WEATHER_WING 10
 #define DELAY_VALUE 500
