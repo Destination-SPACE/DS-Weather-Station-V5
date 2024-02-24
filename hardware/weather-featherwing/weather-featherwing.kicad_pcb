@@ -270,7 +270,7 @@
       (net 2 "+3V3") (pinfunction "VDD") (pintype "power_in") (tstamp 18ada5f7-fb1c-4826-820a-6a840258465d))
     (pad "4" smd rect (at 0.7 -0.4 90) (size 0.5 0.3) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 3 "GND") (pinfunction "VSS") (pintype "passive") (tstamp 4bf9730e-13ea-4ec6-85b6-55dbd5d8386b))
-    (model ":DESTINATION_SPACE_MODELS:Sensors_Environmental/SHT41-AD1B-R3--3DModel-STEP-369182.STEP"
+    (model "${KIPRJMOD}/3d_models/SHT41-AD1B-R3.STEP"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz -90 0 0))
@@ -1315,7 +1315,7 @@
       (net 3 "GND") (pinfunction "Shield") (pintype "passive") (tstamp b45f6110-5b10-4e65-bab9-9e3c965c1de0))
     (pad "MP" smd rect (at 2.8 1.875 270) (size 1.2 1.8) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 3 "GND") (pinfunction "Shield") (pintype "passive") (tstamp 0e2b6f24-3144-4af1-b07c-4c4e64d8e5d7))
-    (model ":DESTINATION_SPACE_MODELS:Connector_JST/SM04B-SRSS-TB(LF)(SN)--3DModel-STEP-56544.STEP"
+    (model "${KIPRJMOD}/3d_models/SM04B-SRSS-TB(LF)(SN).STEP"
       (offset (xyz 0 1.25 -0.3))
       (scale (xyz 1 1 1))
       (rotate (xyz -90 0 0))
