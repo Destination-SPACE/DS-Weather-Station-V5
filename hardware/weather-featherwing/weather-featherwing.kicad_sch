@@ -6,10 +6,10 @@
 
   (title_block
     (title "Weather Featherwing v1.2.1")
-    (date "2024-02-19")
-    (rev "02")
+    (date "2024-03-09")
+    (rev "03")
     (comment 1 "Madison Gleydura")
-    (comment 2 "PROTOTYPE")
+    (comment 2 "FINAL")
     (comment 3 "2024")
   )
 
