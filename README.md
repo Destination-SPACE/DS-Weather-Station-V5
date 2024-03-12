@@ -31,3 +31,10 @@ All hardware files can be found [here](hardware)
 All program files can be found [here](software)
 ## 🗂️ Documentation
 Documentation for the weather station can be found [here](docs)
+
+## Licenses
+Each of the above sections are individually licensed. Terms and conditions apply within their respective folders.
+
+**Documentation - [Apache License 2.0](docs/LICENSE)** <br>
+**Hardware - [CERN-OHL-P](hardware/LICENSE)** <br>
+**Software - [The MIT License](software/LICENSE)**
