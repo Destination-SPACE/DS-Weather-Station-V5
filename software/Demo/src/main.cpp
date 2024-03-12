@@ -4,7 +4,7 @@ DESTINATION WEATHER FEATHER WING EXAMPLE - DEMO
 This is an example sketch for the Destination Weather FeatherWing remote sensing
 platform to test the microSD card reader.
 
-modified 2023-12-17
+modified 2024-03-12
 by Madison Gleydura
 
 MIT LICENSE AGREEMENT
