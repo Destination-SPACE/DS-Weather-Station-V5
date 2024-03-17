@@ -6,7 +6,6 @@ bool SENSOR_ENS160 = true;
 bool SENSOR_GUVA_B = false; //false
 bool SENSOR_LPS22 = true;
 bool SENSOR_LTR390 = true;
-bool SENSOR_MAX17048 = true;
 bool SENSOR_SCD40 = true;
 bool SENSOR_SHT41 = true;
 bool SENSOR_VEML7700 = true;
@@ -22,62 +21,26 @@ bool UNITS_PSI = false;
 bool UNITS_CELCIUS = true;  //true
 bool UNITS_FAHRENHEIT = false;
 
-ScioSense_ENS160 ENS160(ENS160_I2CADDR_0);
+ScioSense_ENS160 ENS160(0x52);
 Adafruit_LPS22 LPS22;
 Adafruit_LTR390 LTR390 = Adafruit_LTR390();
-Adafruit_MAX17048 MAX17048;
 SensirionI2CScd4x SCD40;
 Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
 Adafruit_VEML7700 VEML7700 = Adafruit_VEML7700();
 
-void INITIALIZE_SENSORS(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22, bool SENSOR_LTR390, bool SENSOR_MAX17048, bool SENSOR_SCD40, bool SENSOR_SHT41, bool SENSOR_VEML7700, int DATA_RATE){
+void INITIALIZE_SENSORS(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22, bool SENSOR_LTR390, bool SENSOR_SCD40, bool SENSOR_SHT41, bool SENSOR_VEML7700, int DATA_RATE){
   if(SENSOR_ENS160){
     if(!ENS160.begin()){
       Serial.print("\n\nENS160 Not Found");
       SENSOR_ENS160 = false;
     }
     else{
-      //if(!ENS160.setMode(ENS160_OPMODE_STD)) Serial.print("\n\nENS160 Mode-Set Failure - Restart Device"); while(1) delay(10);
-
       if(1/DATA_RATE > 1){
         Serial.print("\n\nRefresh Rate Too Fast! Decrease Speed");
         while(1){
           delay(10);
         }
       }
-    
-      //Get device validity flag
-      /*Wire.beginTransmission(ENS160_I2CADDR_0);
-      Wire.requestFrom(ENS160_REG_DATA_STATUS,1);
-      byte STATUS = Wire.read();
-      Wire.endTransmission();
-      bool VALIDITY_BIT1 = (STATUS & (1 << 1)) != 0;
-      bool VALIDITY_BIT2 = (STATUS & (1 << 2)) != 0;
-      int VALIDITY = (VALIDITY_BIT1 << 1) | VALIDITY_BIT2;
-
-      //Check the status of the device
-      switch(VALIDITY){
-        case 0:     // Normal operation 
-          break;
-        case 1:     // Warm-up phase
-          Serial.print("\n\nENS160 Warming Up...");
-          for(int i = 180; i > 0; i--){
-              Serial.printf("\nT- %d s", i);
-              delay(1000);
-          }
-          break;
-        case 2:     // Initial start-up phase
-          Serial.print("\n\nENS160 Initial Start-up...");
-          for(int i = 3600; i > 0; i--){
-              Serial.printf("\nT- %d s", i);
-          }
-          break;
-        default:
-          Serial.print("\n\nENS160 Validity Flag Retrieval  Failure - Restart Device");
-          while(1){
-            delay(10);
-          }
-      }*/
     }
   }
 
@@ -129,18 +92,6 @@ void INITIALIZE_SENSORS(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS2
     }
   }
 
-  if(SENSOR_MAX17048){
-    if(!MAX17048.begin()){
-      Serial.print("\n\nMAX17048 Not Found");
-      SENSOR_MAX17048 = false;
-    }
-    else{
-      MAX17048.setAlertVoltages(2.0, 4.2);
-      Serial.print("\n\nMAX17048 Initialized!");
-      SENSOR_MAX17048 = true;
-    }
-  }
-
   if(SENSOR_SCD40){
     SCD40.begin(Wire);
     delay(10);
@@ -180,7 +131,8 @@ void INITIALIZE_SENSORS(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS2
   }
 }
 
-float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22, bool SENSOR_LTR390, bool SENSOR_MAX17048, bool SENSOR_SCD40, bool SENSOR_SHT41, bool SENSOR_VEML7700){
+float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22, bool SENSOR_LTR390, bool SENSOR_SCD40, bool SENSOR_SHT41, bool SENSOR_VEML7700){
+  Serial.println("ENS");
   if(SENSOR_ENS160){
     ENS160_AQI = 0.0f;
     ENS160_eCO2 = 0.0f;
@@ -214,7 +166,7 @@ float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22,
   else{
     //Figure out how to read from ADC
   }
-
+  Serial.println("LPS");
   if(SENSOR_LPS22){
     sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN;
     LPS22.getEvent(&LPS22_PRESSURE_SEN, &LPS22_TEMPERATURE_SEN);
@@ -230,7 +182,7 @@ float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22,
     LPS22_TEMPERATURE = 0.0f;
     LPS22_ALTITUDE = 0.0f;
   }
-
+  Serial.println("LTR");
   if(SENSOR_LTR390){
     LTR390_RAW_UV = 0.0f;
     LTR390_UVI = 0.0f;
@@ -244,18 +196,7 @@ float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22,
     LTR390_RAW_UV = 0.0f;
     LTR390_UVI = 0.0f;
   }
-
-  if(SENSOR_MAX17048){
-    MAX17048_VOLTAGE = MAX17048.cellVoltage();
-    MAX17048_PERCENTAGE = MAX17048.cellPercent();
-    MAX17048_CHARGE_RATE = MAX17048.chargeRate();
-  }
-  else{
-    MAX17048_CHARGE_RATE = 0.0f;
-    MAX17048_PERCENTAGE = 0.0f;
-    MAX17048_VOLTAGE = 0.0f;
-  }
-
+  Serial.println("before");
   if(SENSOR_SCD40){
     bool isDataReady = false;
 
@@ -279,7 +220,7 @@ float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22,
     SCD40_HUMIDITY = 0.0f;
     SCD40_TEMPERATURE = 0.0f;
   }
-
+  Serial.println("after");
   if(SENSOR_SHT41){
     sensors_event_t SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
     SHT41.getEvent(&SHT41_HUMIDITY_SEN, &SHT41_TEMPERATURE_SEN);
@@ -346,5 +287,5 @@ float GET_SENSOR_DATA(bool SENSOR_ENS160, bool SENSOR_GUVA_B, bool SENSOR_LPS22,
     SHT41_TEMPERATURE*(9/5)+32;
   }
 
-  return ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX, SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX;
+  return ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX, SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX;
 }
