@@ -31,9 +31,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "setup.h"
 
 int REFRESH_RATE = 0.5; //Seconds
-units unit;
-sensors sen;
-parameters param;
+//units unit;
+//sensors sen;
+//parameters param;
 
 void setup() {
   Serial.begin(115200);

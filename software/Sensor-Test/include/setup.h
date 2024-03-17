@@ -72,6 +72,10 @@ sensors getSensors(void);
 void INITIALIZE_SENSORS(sensors, int);
 parameters GET_SENSOR_DATA(sensors);
 
+extern units unit;
+extern sensors sen;
+extern parameters param;
+
 //extern bool UNITS_FEET, UNITS_METERS, UNITS_PASCAL, UNITS_MBAR, UNITS_K_PASCAL, UNITS_IN_HG, UNITS_MM_HG, UNITS_PSI, UNITS_CELCIUS, UNITS_FAHRENHEIT;
 
 //Sensors
