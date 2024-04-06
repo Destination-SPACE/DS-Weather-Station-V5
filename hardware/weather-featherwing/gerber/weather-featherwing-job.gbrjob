@@ -3,15 +3,15 @@
     "GenerationSoftware": {
       "Vendor": "KiCad",
       "Application": "Pcbnew",
-      "Version": "7.0.8"
+      "Version": "7.0.11"
     },
-    "CreationDate": "2024-01-05T08:02:47-05:00"
+    "CreationDate": "2024-03-26T20:33:30-04:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "weather-featherwing",
       "GUID": "77656174-6865-4722-9d66-656174686572",
-      "Revision": "02"
+      "Revision": "03"
     },
     "Size": {
       "X": 50.92,
@@ -24,8 +24,8 @@
   "DesignRules": [
     {
       "Layers": "Outer",
-      "PadToPad": 0.175,
-      "PadToTrack": 0.175,
+      "PadToPad": 0.2,
+      "PadToTrack": 0.2,
       "TrackToTrack": 0.2,
       "MinLineWidth": 0.2,
       "TrackToRegion": 0.2,
@@ -67,11 +67,6 @@
       "Path": "weather-featherwing-B_Mask.gbr",
       "FileFunction": "SolderMask,Bot",
       "FilePolarity": "Negative"
-    },
-    {
-      "Path": "weather-featherwing-User_Drawings.gbr",
-      "FileFunction": "Other,User",
-      "FilePolarity": "Positive"
     },
     {
       "Path": "weather-featherwing-Edge_Cuts.gbr",
