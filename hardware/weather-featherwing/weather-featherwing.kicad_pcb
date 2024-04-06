@@ -6,7 +6,7 @@
 
   (paper "USLetter")
   (title_block
-    (title "Weather Featherwing v1.2.1")
+    (title "Weather Featherwing v1.2.2")
     (date "2024-03-26")
     (rev "03")
     (comment 1 "Madison Gleydura")
@@ -64,7 +64,7 @@
     (solder_mask_min_width 0.1016)
     (allow_soldermask_bridges_in_footprints yes)
     (pcbplotparams
-      (layerselection 0x00010f8_ffffffff)
+      (layerselection 0x00211f8_ffffffff)
       (plot_on_all_layers_selection 0x0000000_00000000)
       (disableapertmacros false)
       (usegerberextensions false)
@@ -242,8 +242,8 @@
     (property "populate" "1")
     (path "/e84a8902-4310-47aa-ae17-0cf66cb724d7")
     (attr smd)
-    (fp_text reference "U2" (at 0 -4.55 90 unlocked) (layer "F.SilkS")
-        (effects (font (size 1 1) (thickness 0.1)))
+    (fp_text reference "U2" (at 0 0 unlocked) (layer "F.SilkS") hide
+        (effects (font (size 0.15 0.15) (thickness 0.0375) bold))
       (tstamp 157f1fa1-f41f-4ff6-93b4-32c9e3bae13d)
     )
     (fp_text value "SHT41" (at -0.889 0 unlocked) (layer "F.Fab")
