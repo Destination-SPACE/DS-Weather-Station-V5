@@ -37,13 +37,13 @@ int REFRESH_RATE = 0.5; //Seconds
 
 void setup() {
   Serial.begin(115200);
-  while(!Serial){
-    delay(10);
-  }
+  while(!Serial);
   Wire.begin();
 
+  sen = getSensors();
+
   Serial.print("\n\nInitializing Sensors...");
-  INITIALIZE_SENSORS(sen, REFRESH_RATE);
+  sen = INITIALIZE_SENSORS(sen, REFRESH_RATE);
   Serial.print("\nSensor Initialization Complete!");
 
   Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+");
@@ -55,7 +55,7 @@ void loop() {
       
   char buffer[1024];
 
-  sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %3.0f | %4.0f | %5.1f | %5.2f |%7.3f|", param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR);
+  sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR);
 
   Serial.print(buffer);
 

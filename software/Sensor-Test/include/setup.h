@@ -69,7 +69,7 @@ units getUnits(void);
 sensors getSensors(void);
 
 //Set variable types for functions
-void INITIALIZE_SENSORS(sensors, int);
+sensors INITIALIZE_SENSORS(sensors, int);
 parameters GET_SENSOR_DATA(sensors);
 
 extern units unit;
