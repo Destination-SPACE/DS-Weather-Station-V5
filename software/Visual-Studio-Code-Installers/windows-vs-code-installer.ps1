@@ -1,5 +1,5 @@
 $FileUri = "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"
-$Destination = "C:/downloads/vscodeInstaller.exe"
+$Destination = "/downloads/vscodeInstaller.exe"
 $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
 
 $bitsJobObj = Start-BitsTransfer $FileUri -Destination $Destination
