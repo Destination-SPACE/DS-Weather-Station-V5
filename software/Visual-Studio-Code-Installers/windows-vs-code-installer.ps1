@@ -23,8 +23,6 @@ switch($bitsJobObj.JobState){
     }
 }
 
-
-
 Start-Process -Wait $Destination -ArgumentList $exeArgs
 
 $extensions | ForEach-Object{
