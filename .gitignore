@@ -16,3 +16,5 @@ fp-info-cache
 *.dsn
 *.ses
 *.xml
+*_build
+*public

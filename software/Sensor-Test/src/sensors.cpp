@@ -6,7 +6,7 @@ units unit;
 sensors sen;
 parameters param;
 
-ScioSense_ENS160 ENS160(0x52);
+ScioSense_ENS160 ENS160(ENS160_I2CADDR_0);
 Adafruit_LPS22 LPS22;
 Adafruit_LTR390 LTR390 = Adafruit_LTR390();
 SensirionI2CScd4x SCD40;
@@ -41,134 +41,88 @@ sensors getSensors(void){
   return sen;
 }
 
-void INITIALIZE_SENSORS(sensors sen, int DATA_RATE){
+sensors INITIALIZE_SENSORS(sensors sen, int DATA_RATE){
   if(sen.ens160){
     if(!ENS160.begin()){
-      Serial.print("\n\nENS160 Not Found");
+      Serial.print("\n\nENS160 not found");
       sen.ens160 = false;
     }
     else{
-      if(1/DATA_RATE > 1){
-        Serial.print("\n\nRefresh Rate Too Fast! Decrease Speed");
-        while(1){
-          delay(10);
-        }
+      if(!ENS160.setMode(ENS160_OPMODE_STD)){
+        Serial.print("\n\nENS160 failed to init");
+        sen.ens160 = false;
       }
     }
   }
 
   if(sen.lps22){
     if(!LPS22.begin_I2C()){
-      Serial.print("\n\nLSP22 Not Found");
+      Serial.print("\n\nLSP22 not found");
       sen.lps22 = false;
     }
     else{
-      if(1/DATA_RATE < 10){
-        LPS22.setDataRate(LPS22_RATE_10_HZ);
-        Serial.print("\n\nLPS22 Set to 10Hz");
-        sen.lps22 = true;
-      }
-      else if(1/DATA_RATE < 50){
-        LPS22.setDataRate(LPS22_RATE_50_HZ);
-        Serial.print("\n\nLPS22 Set to 50Hz");
-        sen.lps22 = true;
-      }
-      else{
-        Serial.print("\n\nRefresh Rate Too Fast! Decrease Speed");
-        while(1) delay(10);
-      }
+      LPS22.setDataRate(LPS22_RATE_10_HZ);
     }
   }
 
   if(sen.ltr390){
     if(!LTR390.begin()){
-        Serial.print("\n\nLTR390 Not Found");
+        Serial.print("\n\nLTR390 not found");
         sen.ltr390 = false;
     }
     else{
-      if(1/DATA_RATE > 2){
-        Serial.print("\n\nRefresh Rate Too Fast! Decrease Speed");
-        while(1) delay(10);
-      }
-      else{
-        LTR390.setMode(LTR390_MODE_UVS);
-        LTR390.setGain(LTR390_GAIN_18);
-        LTR390.setResolution(LTR390_RESOLUTION_20BIT);
-        LTR390.setThresholds(100, 1000);
-        Serial.print("\n\nLTR390 Initialized!");
-        sen.ltr390 = true;
-      }
+      LTR390.setMode(LTR390_MODE_UVS);
+      LTR390.setGain(LTR390_GAIN_18);
+      LTR390.setResolution(LTR390_RESOLUTION_20BIT);
+      LTR390.setThresholds(100, 1000);
+      LTR390.configInterrupt(true, LTR390_MODE_UVS);
     }
   }
 
   if(sen.scd40){
     SCD40.begin(Wire);
-    delay(10);
-    if(!SCD40.startPeriodicMeasurement()){
-      Serial.print("\n\nSCD40 Not Found");
+    if(SCD40.stopPeriodicMeasurement() || SCD40.startPeriodicMeasurement()){
+      Serial.print("\n\nSCD40 failed to respond");
       sen.scd40 = false;
-    } 
-    else{
-      SCD40.startPeriodicMeasurement();
-      Serial.print("\n\nSCD40 Initialized!");
-      sen.scd40 = true;
     }
   }
 
   if(sen.sht41){
     if(!SHT41.begin()){
-      Serial.print("\n\nSHT41 Not Found");
+      Serial.print("\n\nSHT41 not found");
       sen.sht41 = false;
     }
     else{
       SHT41.setPrecision(SHT4X_HIGH_PRECISION);
       SHT41.setHeater(SHT4X_NO_HEATER);
-      Serial.print("\n\nSHT41 Initialized!");
-      sen.sht41 = true;
     }
   }
 
   if(sen.veml7700){
     if(!VEML7700.begin()){
-      Serial.print("\n\nVEML7700 Not Found");
+      Serial.print("\n\nVEML7700 not found");
       sen.veml7700 = false;
     }
-    else{
-      Serial.print("\n\nVEML7700 Initialized!");
-      sen.veml7700 = true;
-    }
   }
+
+  return sen;
 }
 
 parameters GET_SENSOR_DATA(sensors sen){
-  Serial.println("ENS");
-  if(sen.ens160){
-    param.aqi = 0.0f;
-    param.eCO2 = 0.0f;
-    param.tvoc = 0.0f;
-    
-    if(ENS160.available()){
-      ENS160.measure(true);
-      ENS160.measureRaw(true);
+  if(sen.ens160 && ENS160.available()){
+    ENS160.measure(true);
+    ENS160.measureRaw(true);
 
-      param.aqi = ENS160.getAQI(); // algorythm from Umweltbundesamt – German Federal Environmental Agency
-      param.eCO2 = ENS160.geteCO2(); //ppm
-      param.tvoc = ENS160.getTVOC(); //ppb
-
-      float tvocCon = param.tvoc*(29/24.45); // ug/m^3
-
-      float alpha = 0.5; //Weight factor
-      param.aqi = alpha*tvocCon + (1-alpha)*aqiPrev; //Calculated from NowCast algorithm
-
-      aqiPrev = param.aqi;
-    }
+    param.aqi = ENS160.getAQI(); // algorithm from Umweltbundesamt – German Federal Environmental Agency
+    param.eCO2 = ENS160.geteCO2(); //ppm
+    param.tvoc = ENS160.getTVOC(); //ppb
   }
   else{
     param.aqi = 0.0f;
     param.aqi = 0.0f;
     param.aqi = 0.0f;
   }
-  Serial.println("LPS");
+
   if(sen.lps22){
     sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN;
     LPS22.getEvent(&LPS22_PRESSURE_SEN, &LPS22_TEMPERATURE_SEN);
@@ -184,48 +138,46 @@ parameters GET_SENSOR_DATA(sensors sen){
     param.tempLPS = 0.0f;
     param.alt = 0.0f;
   }
-  Serial.println("LTR");
-  if(sen.ltr390){
-    param.uvRaw = 0.0f;
-    param.uviLTR = 0.0f;
-    param.alsLTR = 0.0f;
 
-    if(LTR390.newDataAvailable()){
-      param.uvRaw = LTR390.readUVS();
-      param.uviLTR = param.uvRaw / 2300.00;
-      param.alsLTR = LTR390.readALS();
-    }
+  if(sen.ltr390 && LTR390.newDataAvailable()){
+    param.uvRaw = LTR390.readUVS();
+    param.uviLTR = param.uvRaw / 2300.00;
+    param.alsLTR = LTR390.readALS();
   }
   else{
     param.uvRaw = 0.0f;
     param.uviLTR = 0.0f;
     param.alsLTR = 0.0f;
   }
-  Serial.println("SCD40");
+
   if(sen.scd40){
     bool isDataReady = false;
 
-    param.CO2 = 0.0f;
-    param.humdSCD = 0.0f;
-    param.tempSCD = 0.0f;
-
     uint16_t error = SCD40.getDataReadyFlag(isDataReady);
-    if(!error && isDataReady){
+    if(SCD40.getDataReadyFlag(isDataReady)){
+    }
+
+    if(isDataReady){
       uint16_t SCD40_CO2_uint;
-      error = SCD40.readMeasurement(SCD40_CO2_uint, param.tempSCD, param.humdSCD);
-      if (!error && param.CO2 != 0){
-        param.CO2 = SCD40_CO2_uint;
+      if(SCD40.readMeasurement(SCD40_CO2_uint, param.tempSCD, param.humdSCD)){
+      }
+      else if(SCD40_CO2_uint == 0){
+      }
+      else{
+        param.CO2 = static_cast<float>(SCD40_CO2_uint);
         param.humdSCD;
         param.tempSCD;
       }
     }
+    else{
+    }
   }
   else{
     param.CO2 = 0.0f;
     param.humdSCD = 0.0f;
     param.tempSCD = 0.0f;
   }
-  Serial.println("after");
+
   if(sen.sht41){
     sensors_event_t SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
     SHT41.getEvent(&SHT41_HUMIDITY_SEN, &SHT41_TEMPERATURE_SEN);

@@ -19,6 +19,7 @@ release = '0.1.0'
 extensions = [
     'sphinx_rtd_theme',
     'sphinx.ext.autodoc',
+    'myst_parser',
 ]
 
 templates_path = ['_templates']
@@ -27,7 +28,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.txt': 'restructuredtext',
+    '.md': 'markdown',
+}
 master_doc = 'index'
 project = 'Destination Weather Station v5'
 copyright = '2024, Destination SPACE Inc.'
