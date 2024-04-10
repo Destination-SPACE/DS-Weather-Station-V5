@@ -1,7 +1,7 @@
 $Username = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 
 $FileUri = "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64"
-$Destination = "C:$Username/downloads/vscodeInstaller.exe"
+$Destination = "downloads/vscodeInstaller.exe"
 $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
 
 $bitsJobObj = Start-BitsTransfer $FileUri -Destination $Destination
