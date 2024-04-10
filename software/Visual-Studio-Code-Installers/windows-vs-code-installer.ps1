@@ -30,7 +30,7 @@ $extensions | ForEach-Object{
         Write-Host
     }
     catch{
-        $_g
+        $_
         Exit(1)
     }
 }
