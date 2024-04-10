@@ -6,7 +6,7 @@ $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopa
 
 $bitsJobObj = Start-BitsTransfer $FileUri -Destination $Destination
 
-$vsCodeExec = ($Env:PROGRAMFILES) + "\Visual Studio Code\Bin\code.cmd"
+$vsCodeExec = ($Env:PROGRAMFILES) + "\Microsoft VS Code\bin\code.cmd"
 $extensions =@(
     "ms-vscode.cpptools",               #C/C++ Language Support
     "ms-python.python",                 #Python Language Support
