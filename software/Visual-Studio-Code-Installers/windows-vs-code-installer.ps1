@@ -4,7 +4,7 @@ $FileUri = "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64
 $Destination = "vscodeInstaller.exe"
 $exeArgs = '/verysilent /tasks=addcontextmenufiles,addcontextmenufolders,addtopath'
 
-$bitsJobObj = Start-BitsTransfer $FileUri -Destination $Destination /Force
+$bitsJobObj = Start-BitsTransfer $FileUri -Destination $Destination
 
 $vsCodeExec = ($Env:PROGRAMFILES) + "\Microsoft VS Code\bin\code.cmd"
 $extensions =@(
