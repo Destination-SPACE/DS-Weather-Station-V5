@@ -5,12 +5,14 @@ NETWORK:
   SSID: wifi
   PASSWORD: password
 NEO_PIXEL:
-  RGB: TRUE
+  RGB: 
+    STS: TRUE
     RED: 100
     GREEN: 20
     BLUE: 30
     BRIGHTNESS: 10
-  HSV: FALSE
+  HSV: 
+    STS: FALSE
     HUE: 40
     SATURATION: 50
     VALUE: 50
