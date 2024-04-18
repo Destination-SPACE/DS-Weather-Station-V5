@@ -27,14 +27,13 @@ typedef struct{
     bool inhg;
     bool mmhg;
     bool psi;
-    bool celcius;
+    bool celsius;
     bool fahrenheit;
 } units;
 
 //Senors
 typedef struct{
     bool ens160;
-    //bool guvab;
     bool lps22;
     bool ltr390;
     bool scd40;
@@ -59,7 +58,7 @@ typedef struct{
     float tempLPS;   // Temperature - LPS22
     float tempSCD;   // Temperature - SCD40
     float tempSHT;   // Temperature - SHT41
-    float tvoc;      // Total Volitile Organic Compounds - ENS160
+    float tvoc;      // Total Volatile Organic Compounds - ENS160
     float uvRaw;     // Raw UV Measurements - LTR390
     float uviLTR;    // UV Index - LTR390
     //float uviGUVAB;// UV Index - GUVA/B

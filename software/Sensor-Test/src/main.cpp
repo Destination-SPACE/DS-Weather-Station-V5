@@ -60,7 +60,7 @@ void loop() {
   Serial.print(buffer);
 
   while(true){
-    if(millis() - time_prev >= 1000) break;
+    if(millis() - time_prev >= REFRESH_RATE) break;
     delay(5);
   }
 }

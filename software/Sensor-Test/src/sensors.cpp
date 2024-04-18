@@ -24,7 +24,7 @@ units getUnits(void){
   unit.mmhg = false;
   unit.psi = false;
 
-  unit.celcius = true;
+  unit.celsius = true;
   unit.fahrenheit = false;
 
   return unit;

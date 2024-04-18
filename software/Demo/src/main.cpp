@@ -30,8 +30,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************/
 #include "setup.h"
 
-int REFRESH_RATE = 0.05; //Seconds
-float ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX;
+TaskHandle_t Task0;
+TaskHandle_t Task1;
+
+SdFat SD;
+SdFile file;
+
+int hh, mm, ss;
+int clock_timer = 0;
+char fileName[13] = FILE_BASE_NAME "00.csv";
 
 //Declare system components
 Adafruit_NeoPixel PIXEL_FEATHER(1, NEO_PIXEL_FEATHER);
@@ -39,212 +46,149 @@ Adafruit_NeoPixel PIXEL_WING(1, NEO_PIXEL_WING, NEO_GRB + NEO_KHZ800);
 
 void setup() {
   Serial.begin(115200);
-  while(!Serial){
-    delay(10);
+  while(!Serial);
+  Serial.print("Destination Weather Station v5!");
+
+  //Setup Digital IO
+  Serial.print("\n\nSetting up digital IO...");
+  pinMode(BUTTON0, INPUT_PULLUP);
+  pinMode(BUTTON1, INPUT_PULLDOWN);
+  pinMode(BUTTON2, INPUT_PULLDOWN);
+  pinMode(LED, OUTPUT);
+  pinMode(LPS22_INT, INPUT);
+  pinMode(SD_CD, INPUT);
+  pinMode(NEO_PIXEL_FEATHER, OUTPUT);
+  pinMode(NEO_PIXEL_WING, OUTPUT);
+  Serial.print("\nDigital IO setup complete!");
+
+  //Initialize core loops
+  Serial.print("\nInitializing cores...");
+  xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 0, &Task0, 0);
+  xTaskCreatePinnedToCore(loop1, "Task1", 1000, NULL, 0, &Task1, 1);
+  Serial.print("\nCores initialized!");
+
+  Serial.print("\nInitializing NeoPixels...");
+  PIXEL_FEATHER.begin(); // Initialize built-in NeoPixel
+  PIXEL_WING.begin(); // Initialize FeatherWing NeoPixel
+  Serial.print("\nNeoPixels initialized!");
+  
+  Serial.print("\nI2C bus...");
+  Wire.begin();
+  Serial.print("\nI2C bus online!");
+
+  Serial.print("\nInitializing TFT display...");
+  initializeTFT();
+  Serial.print("\nTFT display initialized!");
+
+  Serial.print("\nChecking for SD card...");
+  const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
+  if(digitalRead(SD_CD) == LOW){
+    Serial.print("\nPlease insert microSD card.");
+    while(digitalRead(SD_CD) == LOW){
+      delay(500);
+    }
+  }
+  else{
+    Serial.print("\nSD card detected!");
   }
 
-    //Setup Digitial IO
-    pinMode(BUTTON0, INPUT_PULLUP);
-    pinMode(BUTTON1, INPUT_PULLDOWN);
-    pinMode(BUTTON2, INPUT_PULLDOWN);
-    pinMode(LED, OUTPUT);
+  Serial.print("\nInitializing SD card...");
+  if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
+    Serial.print("\nSD card not responding.");
+    while(true){
+      if(SD.begin(SD_CS, SD_SCK_MHZ(50))){
+        break;
+      }
+      delay(100);
+    }
+  }
+  Serial.print("\nSD card initialized!");
 
-    //Initialize core loops
-    //xTaskCreatePinnedToCore(loop0, "Task0", 1000, NULL, 0, &Task0, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
-    //xTaskCreatePinnedToCore(loop1, "Task0", 1000, NULL, 0, &Task1, 0); // Task Function, Name of Task, Stack Size of Task, Parameter of the Task, Priority of the Task, Task Handle, Core Number
+  Serial.print("\nCreating CSV file...");
+  if(baseNameSize > 6){
+    Serial.print("\n\nFile base name too long.");
+  }
+  while(SD.exists(fileName)){
+    if(fileName[baseNameSize + 1] != '9'){
+      fileName[baseNameSize + 1]++;
+    }
+    else if(fileName[baseNameSize] != '9'){
+      fileName[baseNameSize + 1] = '0';
+      fileName[baseNameSize]++;
+    }
+    else{
+      Serial.print("\n\nCan't create file name.");
+    }
+  }
+  if(file.open(fileName, O_WRONLY | O_CREAT | O_EXCL)){
+    file.println(F("Time (s),Temp (C),Hum (%),HI (C), Dew Point (C), PRES (hPa),ALT (m),CO2 (ppm), eCO2 (ppm), TVOC (ppb),AQI (1-5), RAW UV, UVI (0-11),LUX (k-lux)\n"));
+    Serial.print("\nCSV file created!");
+  }
+  else{
+    Serial.print("\n\nError opening file.");
+  }
 
-    PIXEL_FEATHER.begin(); // Initialize built-in NeoPixel
-    PIXEL_WING.begin(); // Initialize FeatherWing NeoPixel
+  Serial.print("\nImporting config.yaml...");
+  deserializeYAML();
+  Serial.print("\nYAML file deserialized!");
 
-    //USB_MSC.setID("DSPACE", "SD Card", "1.0");
-    //USB_MSC.setReadWriteCallback(msc_read_cb, msc_write_cb, msc_flush_cb);
-    //USB_MSC.setUnitReady(false);
-    //USB_MSC.begin();
+  config = getConfig();
+  Serial.print("\nConfigurations imported!");
 
-    
-    Wire.begin();
+  Serial.print("\nConfiguring settings...");
+  unit = getUnits();
+  sen = getSensors();
 
-    /*if(SD_CD == HIGH){
-    Serial.print("\n\033[48;5;1mSD Card not Inserted\033[0m");
-        while(SD_CD == HIGH){
-            delay(10);
-        }
-    }*/
+  Serial.print("\nInitializing sensors...");
+  sen = initializeSensors(sen);
 
-    Serial.print("\nInitializing SD card ... ");
+  Serial.print("\n\nInitialization complete!");
 
-    /*if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
-    Serial.print("\n\033[48;5;1mInitialization Failed\033[0m");
-        while(1){
-            delay(10);
-        }
-    }*/
-    
-    //Serial.print("\n\nImporting config.yaml...");
-    //const char* YAML_CONTENT = READ_YAML("/config.yaml");
-    //Serial.print("\n\nYAML File Imported!\nDeserializing YAML Content...");
-    //DESERIALIZE_YAML_TO_JSON_OBJECT(YAML_CONTENT);
-    //Serial.print("\n\nYAML File Deserialized!");
+  Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa  | (m) |(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+");
 
-    Serial.print("\n\nInitializing Sensors...");
-    INITIALIZE_SENSORS(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700, REFRESH_RATE);
-    Serial.print("\nSensor Initialization Complete!");
-
-    Serial.print("\n\nInitializing TFT Display...");
-    INITIALIZE_TFT();
-    Serial.print("\n\nTFT Initialization Complete!");
-    Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+");
 }
 
-/*void loop0(void * parameter){
-    for(;;){
-      int time_prev = millis();
-      ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX = GET_SENSOR_DATA(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700);
-      
-      char buffer[1024];
+void loop0(void * parameter){
+  for(;;){
+    int time_prev = millis();
+    param = getSensorData(sen);
 
-      sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %3.0f | %4.0f | %5.1f | %5.2f |%7.3f|", SHT41_TEMPERATURE, SHT41_HUMIDITY, LPS22_PRESSURE, LPS22_ALTITUDE, SCD40_CO2, ENS160_TVOC, ENS160_AQI, LTR390_UVI, VEML7700_LUX);
-
-      Serial.print(buffer);
-
-      while(true){
-        if(millis() - time_prev >= 1000) break;
-        delay(5);
+    //Clock timer
+    ss = (millis() - clock_timer)/1000; // Set seconds to how much time has elapsed since first data read
+    if(ss >= 60){ // If seconds is 60+, add 1 minutes and reset seconds variable
+      clock_timer = millis();
+      ss = ss - 60;
+      mm = mm + 1;
+      if(mm >= 60){ // If minutes is 60+, add 1 hours and reset minutes and seconds
+        ss = ss - 60;
+        mm = mm - 60;
+        hh = hh + 1;
       }
-      
     }
+    
+    char buffer[1024];
+
+    sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uvi, param.alsLTR);
+
+    Serial.print(buffer);
+
+    char fileBuffer[1024];
+
+    sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uvi, param.alsVEML);
+
+    while(true){
+      if(millis() - time_prev >= config.refreshRate) break;
+      delay(5);
+    }
+  }
 }
 
 void loop1(void * parameter){
     for(;;){
 
     }
-}*/
+}
 
 void loop() {
-  int time_prev = millis();
-  ENS160_AQI, ENS160_eCO2, ENS160_TVOC, LPS22_ALTITUDE, LPS22_PRESSURE, LPS22_TEMPERATURE, LTR390_RAW_UV, LTR390_UVI, MAX17048_CHARGE_RATE, MAX17048_PERCENTAGE, MAX17048_VOLTAGE, SCD40_CO2, SCD40_HUMIDITY, SCD40_TEMPERATURE, SHT41_ABSOLUTE_HUMIDITY, SHT41_HEAT_INDEX,SHT41_HUMIDITY, SHT41_TEMPERATURE, VEML7700_LUX = GET_SENSOR_DATA(SENSOR_ENS160, SENSOR_GUVA_B, SENSOR_LPS22, SENSOR_LTR390, SENSOR_MAX17048, SENSOR_SCD40, SENSOR_SHT41, SENSOR_VEML7700);
-      
-  char buffer[1024];
-
-  sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %3.0f | %4.0f | %5.1f | %5.2f |%7.3f|", SHT41_TEMPERATURE, SHT41_HUMIDITY, LPS22_PRESSURE, LPS22_ALTITUDE, SCD40_CO2, ENS160_TVOC, ENS160_AQI, LTR390_UVI, VEML7700_LUX);
-
-  Serial.print(buffer);
-
-  while(true){
-    if(millis() - time_prev >= 1000) break;
-    delay(5);
-  }
+  
 }
-
-/*const char* READ_YAML(const char* filename){
-    if(!file.open(filename)){
-        Serial.print("\nError opening file");
-
-        return "";
-    }
-
-    size_t size = file.fileSize();
-    char* buffer = (char*)malloc(size + 1);
-
-    if(!buffer){
-        Serial.print("\nMemory allocation failed");
-        file.close();
-
-        return "";
-    }
-
-    file.read(buffer, size);
-    buffer[size] = '\0';
-    file.close();
-
-    return buffer;
-
-}
-
-void DESERIALIZE_YAML_TO_JSON_OBJECT(const char* YAML_CONTENT){
-    StaticJsonDocument<2048> JSON_DOC;
-    JsonObject JSON_OBJECT = JSON_DOC.to<JsonObject>();
-    auto ERROR = deserializeYml(JSON_OBJECT, YAML_CONTENT);
-    if(ERROR){
-        Serial.printf("Unable to deserialize YAML to JsonObject: %s", ERROR.c_str() );
-
-        return;
-    }
-    
-    STUDENT_NAME = JSON_OBJECT["STUDENT_NAME"].as<const char*>();
-    REFRESH_RATE = JSON_OBJECT["REFRESH_RATE"].as<int>();
-
-    SSID = JSON_OBJECT["NETWORK"]["SSID"].as<const char*>();
-    PASSWORD = JSON_OBJECT["NETWORK"]["PASSWORD"].as<const char*>();
-
-    NEO_PIXEL_RGB = JSON_OBJECT["NEO_PIXEL"]["RGB"].as<bool>();
-    NEO_RED = JSON_OBJECT["NEO_PIXEL"]["RGB"]["RED"].as<int>();
-    NEO_GREEN = JSON_OBJECT["NEO_PIXEL"]["RGB"]["GREEN"].as<int>();
-    NEO_BLUE = JSON_OBJECT["NEO_PIXEL"]["RGB"]["BLUE"].as<int>();
-    NEO_BRIGHTNESS = JSON_OBJECT["NEO_PIXEL"]["RGB"]["BRIGHTNESS"].as<int>();
-    NEO_PIXEL_HSV = JSON_OBJECT["NEO_PIXEL"]["HSV"].as<bool>();
-    NEO_HUE = JSON_OBJECT["NEO_PIXEL"]["HSV"]["HUE"].as<int>();
-    NEO_SATURATION = JSON_OBJECT["NEO_PIXEL"]["HSV"]["SATURATION"].as<int>();
-    NEO_VALUE = JSON_OBJECT["NEO_PIXEL"]["HSV"]["VALUE"].as<int>();
-
-    UNITS_FEET = JSON_OBJECT["UNITS"]["ALTITUDE"]["FEET"].as<bool>();
-    UNITS_METERS = JSON_OBJECT["UNITS"]["ALTITUDE"]["METERS"].as<bool>();
-    UNITS_PASCAL = JSON_OBJECT["UNITS"]["PRESSURE"]["PASCAL"].as<bool>();
-    UNITS_MBAR = JSON_OBJECT["UNITS"]["PRESSURE"]["MBAR"].as<bool>();
-    UNITS_K_PASCAL = JSON_OBJECT["UNITS"]["PRESSURE"]["K_PASCAL"].as<bool>();
-    UNITS_IN_HG = JSON_OBJECT["UNITS"]["PRESSURE"]["IN_HG"].as<bool>();
-    UNITS_MM_HG = JSON_OBJECT["UNITS"]["PRESSURE"]["MM_HG"].as<bool>();
-    UNITS_PSI = JSON_OBJECT["UNITS"]["PRESSURE"]["PSI"].as<bool>();
-    UNITS_CELCIUS = JSON_OBJECT["UNITS"]["TEMPERATURE"]["CELCIUS"].as<bool>();
-    UNITS_FAHRENHEIT = JSON_OBJECT["UNITS"]["TEMPERATURE"]["FAHRENHEIT"].as<bool>();
-
-    SENSOR_ENS160 = JSON_OBJECT["SENSORS"]["ENS160"].as<bool>();
-    SENSOR_GUVA_B = JSON_OBJECT["SENSORS"]["GUVA_B"].as<bool>();
-    SENSOR_LPS22 = JSON_OBJECT["SENSORS"]["LPS22"].as<bool>();
-    SENSOR_LTR390 = JSON_OBJECT["SENSORS"]["LTR390"].as<bool>();
-    SENSOR_MAX17048 = JSON_OBJECT["SENSORS"]["MAX17048"].as<bool>();
-    SENSOR_SCD40 = JSON_OBJECT["SENSORS"]["SCD40"].as<bool>();
-    SENSOR_SHT41 = JSON_OBJECT["SENSORS"]["SHT41"].as<bool>();
-    SENSOR_VEML7700 = JSON_OBJECT["SENSORS"]["VEML7700"].as<bool>();
-}
-
-int32_t msc_read_cb (uint32_t lba, void* buffer, uint32_t bufsize){
-  bool rc;
-
-  #if SD_FAT_VERSION >= 20000
-    rc = SD.card()->readSectors(lba, (uint8_t*) buffer, bufsize/512);
-  #else
-    rc = SD.card()->readBlocks(lba, (uint8_t*) buffer, bufsize/512);
-  #endif
-
-  return rc ? bufsize : -1;
-}
-
-int32_t msc_write_cb (uint32_t lba, uint8_t* buffer, uint32_t bufsize){
-  bool rc;
-
-  digitalWrite(LED_BUILTIN, HIGH);
-
-  #if SD_FAT_VERSION >= 20000
-    rc = SD.card()->writeSectors(lba, buffer, bufsize/512);
-  #else
-    rc = SD.card()->writeBlocks(lba, buffer, bufsize/512);
-  #endif
-
-  return rc ? bufsize : -1;
-}
-
-void msc_flush_cb (void){
-  #if SD_FAT_VERSION >= 20000
-    SD.card()->syncDevice();
-  #else
-    sd.card()->syncBlocks();
-  #endif
-
-  SD.cacheClear();
-
-  FS_CHANGED = true;
-
-  digitalWrite(LED_BUILTIN, LOW);
-}*/
