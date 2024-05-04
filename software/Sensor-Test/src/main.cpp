@@ -30,10 +30,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *******************************************************************************/
 #include "setup.h"
 
-int REFRESH_RATE = 0.5; //Seconds
-//units unit;
-//sensors sen;
-//parameters param;
+int refreshRate = 500; // Milliseconds
+int clockTimer, hh, mm, ss;
 
 void setup() {
   Serial.begin(115200);
@@ -43,24 +41,44 @@ void setup() {
   sen = getSensors();
 
   Serial.print("\n\nInitializing Sensors...");
-  sen = INITIALIZE_SENSORS(sen, REFRESH_RATE);
+  sen = INITIALIZE_SENSORS(sen, refreshRate);
   Serial.print("\nSensor Initialization Complete!");
 
-  Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+");
+  Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+"); // Print header to terminal
+
+  clockTimer = 0;
+  hh = 0;
+  mm = 0;
+  ss = 0;
 }
 
 void loop() {
-  int time_prev = millis();
-  param = GET_SENSOR_DATA(sen);
+  int previousTime = millis(); // Reset the clock
+  param = GET_SENSOR_DATA(sen); // Get sensor data (see sensors.cpp)
+
+  //Clock timer
+  ss = (millis() - clockTimer)/1000; // Set seconds to how much time has elapsed since first data read
+  if(ss >= 60){ // If seconds is 60+, add 1 minutes and reset seconds variable
+    clockTimer = millis();
+    ss = ss - 60;
+    mm = mm + 1;
+    if(mm >= 60){ // If minutes is 60+, add 1 hours and reset minutes and seconds
+      ss = ss - 60;
+      mm = mm - 60;
+      hh = hh + 1;
+    }
+  }
       
-  char buffer[1024];
+  char buffer[1024]; // Create a 1024 bit character buffer
 
-  sprintf(buffer,"\n|20:12:12| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR);
+  sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR); // Add sensor data to the buffer
 
-  Serial.print(buffer);
+  Serial.print(buffer); // Print sensor data
 
   while(true){
-    if(millis() - time_prev >= REFRESH_RATE) break;
+    if(millis() - previousTime >= refreshRate){ // Check if the delay period has elapsed
+      break;
+    }
     delay(5);
   }
 }
