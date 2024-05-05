@@ -1,21 +1,23 @@
 {
-  "STUDENT_NAME": "12345678",
+  "STUDENT_NAME": "Name",
   "REFRESH_RATE": 500,
   "NETWORK": {
-    "SSID": "123456789012",
-    "PASSWORD": "123456789012"
+    "SSID": "wifi",
+    "PASSWORD": "password"
   },
   "NEO_PIXEL": {
     "RGB": {
+      "STS": true,
       "RED": 100,
       "GREEN": 20,
       "BLUE": 30,
-      "BRIGHTNESS": null
+      "BRIGHTNESS": 10
     },
     "HSV": {
-      "HUE": null,
-      "SATURATION": null,
-      "VALUE": null
+      "STS": false,
+      "HUE": 40,
+      "SATURATION": 50,
+      "VALUE": 50
     }
   },
   "UNITS": {
@@ -32,13 +34,12 @@
       "PSI": false
     },
     "TEMPERATURE": {
-      "CELCIUS": true,
+      "CELSIUS": true,
       "FAHRENHEIT": false
     }
   },
   "SENSORS": {
     "ENS160": false,
-    "GUVA/B": false,
     "LPS22": true,
     "LTR390": false,
     "MAX17048": false,
