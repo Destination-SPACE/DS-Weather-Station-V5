@@ -107,6 +107,11 @@ void setup() {
     sensor.veml7700 = doc["SENSORS"]["VEML7700"] | false;
 
     file.close();
+
+    Serial.println(config.studentName);
+    Serial.println(config.refreshRate);
+    Serial.println(config.wifiSSID);
+    Serial.println(config.wifiPASS);
   }
   else{
     Serial.print("\nCould not open file");
