@@ -38,6 +38,18 @@ void setup() {
   while(!Serial);
   Wire.begin();
 
+  if(digitalRead(SD_CD)){
+    Serial.print("\nPlease insert SD card...");
+    while(true);
+  }
+
+  if(!SD.begin(SD_CS)){
+    Serial.print("\nSD card initialization failed...");
+  }
+  else{
+    Serial.print("\nSD card initialization complete!");
+  }
+
   sen = getSensors();
 
   Serial.print("\n\nInitializing Sensors...");

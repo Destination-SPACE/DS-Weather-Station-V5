@@ -8,6 +8,8 @@
 #include <Adafruit_Sensor.h>
 #include <SPI.h>
 #include <Wire.h>
+#include <SdFat.h>
+#include <ArduinoJson.h>
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
@@ -16,6 +18,9 @@
 #include <Adafruit_LTR390.h>
 #include <SensirionI2CScd4x.h>
 #include <Adafruit_VEML7700.h>
+
+#define SD_CS 5
+#define SD_CD 6
 
 //Units
 typedef struct{
@@ -63,6 +68,9 @@ typedef struct{
     float uviLTR;    // UV Index - LTR390
     //float uviGUVAB;// UV Index - GUVA/B
 } parameters;
+
+extern SdFat SD;
+extern SdFile file;
 
 units getUnits(void);
 sensors getSensors(void);

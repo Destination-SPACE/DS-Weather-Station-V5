@@ -6,6 +6,9 @@ units unit;
 sensors sen;
 parameters param;
 
+SdFat SD;
+SdFile file;
+
 ScioSense_ENS160 ENS160(ENS160_I2CADDR_0);
 Adafruit_LPS22 LPS22;
 Adafruit_LTR390 LTR390 = Adafruit_LTR390();
@@ -14,30 +17,60 @@ Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
 Adafruit_VEML7700 VEML7700 = Adafruit_VEML7700();
 
 units getUnits(void){
-  unit.feet = false;
-  unit.meters = true;
+  if(!file.open("config.json", FILE_READ)){
+    Serial.print("\nFailed to open config.json or file does not exist");
+  }
+  if(file){
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    if(error){
+      Serial.print("\nDeserializeJson() failed");
+      Serial.print(error.f_str());
+    }
 
-  unit.pascal = false;
-  unit.mbar = true;
-  unit.kpa = false;
-  unit.inhg = false;
-  unit.mmhg = false;
-  unit.psi = false;
-
-  unit.celsius = true;
-  unit.fahrenheit = false;
+    unit.feet = doc["UNITS"]["ALTITUDE"]["FEET"] | false;
+    unit.meters = doc["UNITS"]["ALTITUDE"]["METERS"] | false;
+    unit.pascal = doc["UNITS"]["PRESSURE"]["PASCAL"] | false;
+    unit.mbar = doc["UNITS"]["PRESSURE"]["MBAR"] | false;
+    unit.kpa = doc["UNITS"]["PRESSURE"]["K_PASCAL"] | false;
+    unit.inhg = doc["UNITS"]["PRESSURE"]["IN_HG"] | false;
+    unit.mmhg = doc["UNITS"]["PRESSURE"]["MM_HG"] | false;
+    unit.psi = doc["UNITS"]["PRESSURE"]["PSI"] | false;
+    unit.celsius = doc["UNITS"]["TEMPERATURE"]["CELSIUS"] | false;
+    unit.fahrenheit = doc["UNITS"]["TEMPERATURE"]["FAHRENHEIT"] | false;
+    file.close();
+  }
+  else{
+    Serial.print("\nCould not open config.json");
+  }
 
   return unit;
 }
 
 sensors getSensors(void){
-  sen.ens160 = true;
-  sen.lps22 = true;
-  sen.ltr390 = true;
-  sen.scd40 = true;
-  sen.sht41 = true;
-  sen.veml7700 = true;
+  if(!file.open("config.json", FILE_READ)){
+    Serial.print("\nFailed to open config.json or file does not exist");
+  }
+  if(file){
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    if(error){
+      Serial.print("\nDeserializeJson() failed");
+      Serial.print(error.f_str());
+    }
 
+    sen.ens160 = doc["SENSORS"]["ENS160"] | false;
+    sen.lps22 = doc["SENSORS"]["LPS22"] | false;
+    sen.ltr390 = doc["SENSORS"]["LTR390"] | false;
+    sen.scd40 = doc["SENSORS"]["SCD40"] | false;
+    sen.sht41 = doc["SENSORS"]["SHT41"] | false;
+    sen.veml7700 = doc["SENSORS"]["VEML7700"] | false;
+
+    file.close();
+  }
+  else{
+    Serial.print("\nCould not open config.json");
+  }
   return sen;
 }
 

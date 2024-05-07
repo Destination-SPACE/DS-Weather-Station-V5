@@ -39,12 +39,12 @@
     }
   },
   "SENSORS": {
-    "ENS160": false,
+    "ENS160": true,
     "LPS22": true,
-    "LTR390": false,
-    "MAX17048": false,
-    "SCD40": false,
-    "SHT41": false,
-    "VEML7700": false
+    "LTR390": true,
+    "MAX17048": true,
+    "SCD40": true,
+    "SHT41": true,
+    "VEML7700": true
   }
 }
