@@ -79,6 +79,10 @@ sensors getSensors(void);
 sensors INITIALIZE_SENSORS(sensors, int);
 parameters GET_SENSOR_DATA(sensors);
 
+extern String alt;
+extern String pres;
+extern String temp;
+
 extern units unit;
 extern sensors sen;
 extern parameters param;

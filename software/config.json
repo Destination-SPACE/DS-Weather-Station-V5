@@ -34,8 +34,8 @@
       "PSI": false
     },
     "TEMPERATURE": {
-      "CELSIUS": true,
-      "FAHRENHEIT": false
+      "CELSIUS": false,
+      "FAHRENHEIT": true
     }
   },
   "SENSORS": {

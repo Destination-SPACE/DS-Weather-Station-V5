@@ -51,12 +51,15 @@ void setup() {
   }
 
   sen = getSensors();
+  unit = getUnits();
 
   Serial.print("\n\nInitializing Sensors...");
   sen = INITIALIZE_SENSORS(sen, refreshRate);
   Serial.print("\nSensor Initialization Complete!");
 
-  Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa. | (m) |(ppm)|(ppb.)|(0-300)|(0-+11)|(k-lux)|\n+==============================================================================+"); // Print header to terminal
+  char buffer[1024];
+  sprintf(buffer,"\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| %s |(pct)| %s |%s|%s|(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+", temp, temp, pres, alt); // Print header to terminal
+  Serial.print(buffer);
 
   clockTimer = 0;
   hh = 0;
@@ -83,7 +86,7 @@ void loop() {
       
   char buffer[1024]; // Create a 1024 bit character buffer
 
-  sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR); // Add sensor data to the buffer
+  sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f| %4.1f | %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR); // Add sensor data to the buffer
 
   Serial.print(buffer); // Print sensor data
 

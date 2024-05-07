@@ -6,6 +6,10 @@ units unit;
 sensors sen;
 parameters param;
 
+String alt;
+String pres;
+String temp;
+
 SdFat SD;
 SdFile file;
 
@@ -39,6 +43,41 @@ units getUnits(void){
     unit.celsius = doc["UNITS"]["TEMPERATURE"]["CELSIUS"] | false;
     unit.fahrenheit = doc["UNITS"]["TEMPERATURE"]["FAHRENHEIT"] | false;
     file.close();
+
+    if(unit.feet){
+      alt = "(ft.)";
+    }
+    else{
+      alt = " (m) ";
+    }
+
+    if(unit.pascal){
+      pres = " (Pa) ";
+    }
+    else if(unit.mbar){
+      pres = "(mbar)";
+    }
+    else if(unit.kpa){
+      pres = "(kPa.)";
+    }
+    else if(unit.inhg){
+      pres = "(inHg)";
+    }
+    else if(unit.mmhg){
+      pres = "(mmHg)";
+    }
+    else if(unit.psi){
+      pres = "(Psi.)";
+    }
+    else{}
+
+    if(unit.celsius){
+      temp = "(°C)";
+    }
+    else{
+      temp = "(°F)";
+    }
+
   }
   else{
     Serial.print("\nCould not open config.json");
@@ -272,9 +311,10 @@ parameters GET_SENSOR_DATA(sensors sen){
   else{}
 
   if(unit.fahrenheit){
-    param.tempLPS*(9/5)+32;
-    param.tempSCD*(9/5)+32;
-    param.tempSHT*(9/5)+32;
+    param.tempLPS = param.tempLPS*1.8+32;
+    param.tempSCD = param.tempSCD*1.8+32;
+    param.tempSHT = param.tempSHT*1.8+32;
+    param.heatIndex = param.heatIndex*1.8+32;
   }
 
   return param;
