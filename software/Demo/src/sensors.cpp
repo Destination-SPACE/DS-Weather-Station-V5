@@ -5,7 +5,10 @@ sensors sen;
 parameters param;
 configuration config;
 
-const char* yamlString = "";
+SdFat SD;
+SdFile file;
+
+String alt, pres, temp, alt_file, pres_file, temp_file;
 
 ScioSense_ENS160 ENS160(ENS160_I2CADDR_0);
 Adafruit_LPS22 LPS22;
@@ -17,99 +20,156 @@ Adafruit_VEML7700 VEML7700 = Adafruit_VEML7700();
 Adafruit_ST7789 TFT = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 //Adafruit_USBD_MSC USB_MSC;
-DynamicJsonDocument doc(128);
-JsonObject json_obj = doc.as<JsonObject>();
-
-
-void deserializeYAML(void){
-  if(file.open("config.yaml", O_READ)){
-    while(file.available()){
-      yamlString += (char)file.read();
-    }
-    file.close();
-    
-    deserializeYml(json_obj, yamlString); // deserialize yaml string to JsonObject
-  }
-  else{
-    Serial.print("\n\nCant read config file");
-  }
-}
 
 configuration getConfig(void){
-  config.studentName = json_obj["STUDENT_NAME"];
-  config.refreshRate = json_obj["REFRESH_RATE"];
+  if(!file.open("config.json", FILE_READ)){
+    Serial.print("\nFailed to open config.json or file does not exist");
+  }
+  if(file){
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    if(error){
+      Serial.print("\nDeserializeJson() failed");
+      Serial.print(error.f_str());
+    }
 
-  JsonObject NETWORK_obj = json_obj["NETWORK"].as<JsonObject>();
+    config.studentName = doc["STUDENT_NAME"] | "NAME";
+    config.refreshRate = doc["REFRESH_RATE"] | 1000;
+    config.wifiSSID = doc["NETWORK"]["SSID"] | "wifi";
+    config.wifiPASS = doc["NETWORK"]["PASSWORD"] | "password";
 
-  config.wifiSSID = NETWORK_obj["SSID"];
-  config.wifiPASS = NETWORK_obj["PASSWORD"];
+    config.neoPixelRGB = doc["NEO_PIXEL"]["RGB"]["STS"] | true;
+    config.neoPixelRed = doc["NEO_PIXEL"]["RGB"]["RED"] | 0;
+    config.neoPixelGrn = doc["NEO_PIXEL"]["RGB"]["GREEN"] | 0;
+    config.neoPixelBlu = doc["NEO_PIXEL"]["RGB"]["BLUE"] | 30;
+    config.neoPixelBri = doc["NEO_PIXEL"]["RGB"]["BRIGHTNESS"] | 10;
 
-  JsonObject NEOPIXEL_obj = json_obj["NEO_PIXEL"].as<JsonObject>();
-  JsonObject NEOPIXEL_RGB_obj = NEOPIXEL_obj["RGB"].as<JsonObject>();
-  JsonObject NEOPIXEL_HSV_obj = NEOPIXEL_obj["HSV"].as<JsonObject>();
-  
-  config.neoPixelRGB = NEOPIXEL_RGB_obj["STS"];
-  config.neoPixelRed = NEOPIXEL_RGB_obj["RED"];
-  config.neoPixelGrn = NEOPIXEL_RGB_obj["GREEN"];
-  config.neoPixelBlu = NEOPIXEL_RGB_obj["BLUE"];
-  config.neoPixelBri = NEOPIXEL_RGB_obj["BRIGHTNESS"];
+    config.neoPixelHSV = doc["NEO_PIXEL"]["HSV"]["STS"] | false;
+    config.neoPixelHue = doc["NEO_PIXEL"]["HSV"]["HUE"] | 0;
+    config.neoPixelSat = doc["NEO_PIXEL"]["HSV"]["SATURATION"] | 0;
+    config.neoPixelVal = doc["NEO_PIXEL"]["HSV"]["VALUE"] | 0;
 
-  config.neoPixelHSV = NEOPIXEL_HSV_obj["STS"];
-  config.neoPixelHue = NEOPIXEL_HSV_obj["HUE"];
-  config.neoPixelSat = NEOPIXEL_HSV_obj["SATURATION"];
-  config.neoPixelVal = NEOPIXEL_HSV_obj["VALUE"];
-
+    file.close();
+  }
+  else{
+    Serial.print("\nCould not open config.json");
+  }
   return config;
 }
 
 units getUnits(void){
-  JsonObject UNITS_obj = json_obj["UNITS"].as<JsonObject>();
+  if(!file.open("config.json", FILE_READ)){
+    Serial.print("\nFailed to open config.json or file does not exist");
+  }
+  if(file){
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    if(error){
+      Serial.print("\nDeserializeJson() failed");
+      Serial.print(error.f_str());
+    }
 
-  JsonObject ALTITUDE_obj = UNITS_obj["ALTITUDE"].as<JsonObject>();
+    unit.feet = doc["UNITS"]["ALTITUDE"]["FEET"] | false;
+    unit.meters = doc["UNITS"]["ALTITUDE"]["METERS"] | false;
+    unit.pascal = doc["UNITS"]["PRESSURE"]["PASCAL"] | false;
+    unit.mbar = doc["UNITS"]["PRESSURE"]["MBAR"] | false;
+    unit.kpa = doc["UNITS"]["PRESSURE"]["K_PASCAL"] | false;
+    unit.inhg = doc["UNITS"]["PRESSURE"]["IN_HG"] | false;
+    unit.mmhg = doc["UNITS"]["PRESSURE"]["MM_HG"] | false;
+    unit.psi = doc["UNITS"]["PRESSURE"]["PSI"] | false;
+    unit.celsius = doc["UNITS"]["TEMPERATURE"]["CELSIUS"] | false;
+    unit.fahrenheit = doc["UNITS"]["TEMPERATURE"]["FAHRENHEIT"] | false;
+    file.close();
 
-  unit.feet = ALTITUDE_obj["FEET"];
-  unit.meters = ALTITUDE_obj["METERS"];
+    if(unit.feet){
+      alt = "(ft.)";
+      alt_file = "(ft)";
+    }
+    else{
+      alt = " (m) ";
+      alt_file = "(m)";
+    }
 
-  JsonObject PRESSURE_obj = UNITS_obj["PRESSURE"].as<JsonObject>();
+    if(unit.pascal){
+      pres = " (Pa) ";
+      pres_file = "(Pa)";
+    }
+    else if(unit.mbar){
+      pres = "(mbar)";
+      pres_file = "(mbar)";
+    }
+    else if(unit.kpa){
+      pres = "(kPa.)";
+      pres_file = "(kPa)";
+    }
+    else if(unit.inhg){
+      pres = "(inHg)";
+      pres_file = "(inHg)";
+    }
+    else if(unit.mmhg){
+      pres = "(mmHg)";
+      pres_file = "(mmHg)";
+    }
+    else if(unit.psi){
+      pres = "(Psi.)";
+      pres_file = "(psi)";
+    }
+    else{}
 
-  unit.pascal = PRESSURE_obj["PASCAL"];
-  unit.mbar = PRESSURE_obj["MBAR"];
-  unit.kpa = PRESSURE_obj["K_PASCAL"];
-  unit.inhg = PRESSURE_obj["IN_HG"];
-  unit.mmhg = PRESSURE_obj["MM_HG"];
-  unit.psi = PRESSURE_obj["PSI"]; 
+    if(unit.celsius){
+      temp = "(°C)";
+      temp_file = "(C)";
+    }
+    else{
+      temp = "(°F)";
+      temp_file = "(F)";
+    }
 
-  JsonObject TEMPERATURE_obj = UNITS_obj["TEMPERATURE"].as<JsonObject>();
-
-  unit.celsius = TEMPERATURE_obj["CELSIUS"];
-  unit.fahrenheit = TEMPERATURE_obj["FAHRENHEIT"];
+  }
+  else{
+    Serial.print("\nCould not open config.json");
+  }
 
   return unit;
 }
 
 sensors getSensors(void){
-  JsonObject SENSORS_obj = json_obj["SENSORS"].as<JsonObject>();
+  if(!file.open("config.json", FILE_READ)){
+    Serial.print("\nFailed to open config.json or file does not exist");
+  }
+  if(file){
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, file);
+    if(error){
+      Serial.print("\nDeserializeJson() failed");
+      Serial.print(error.f_str());
+    }
 
-  sen.ens160 = SENSORS_obj["ENS160"];
-  sen.lps22 = SENSORS_obj["LPS22"];
-  sen.ltr390 = SENSORS_obj["LTR390"];
-  sen.max1704 = SENSORS_obj["MAX17048"];
-  sen.scd40 = SENSORS_obj["SCD40"];
-  sen.sht41 = SENSORS_obj["SHT41"];
-  sen.veml7700 = SENSORS_obj["VEML7700"];
+    sen.ens160 = doc["SENSORS"]["ENS160"] | false;
+    sen.lps22 = doc["SENSORS"]["LPS22"] | false;
+    sen.ltr390 = doc["SENSORS"]["LTR390"] | false;
+    sen.max1704 = doc["SENSORS"]["MAX17048"] | false;
+    sen.scd40 = doc["SENSORS"]["SCD40"] | false;
+    sen.sht41 = doc["SENSORS"]["SHT41"] | false;
+    sen.veml7700 = doc["SENSORS"]["VEML7700"] | false;
 
+    file.close();
+  }
+  else{
+    Serial.print("\nCould not open config.json");
+  }
   return sen;
 }
 
 sensors initializeSensors(sensors sen){
   if(sen.ens160){
     if(!ENS160.begin()){
-      Serial.print("\n\nENS160 not found.");
+      Serial.print("\n\nENS160 not found");
       sen.ens160 = false;
     }
     else{
       if(!ENS160.setMode(ENS160_OPMODE_STD)){
-        Serial.print("\n\nENS160 failed to init.");
+        Serial.print("\n\nENS160 failed to init");
         sen.ens160 = false;
       }
     }
@@ -117,7 +177,7 @@ sensors initializeSensors(sensors sen){
 
   if(sen.lps22){
     if(!LPS22.begin_I2C()){
-      Serial.print("\n\nLSP22 not found.");
+      Serial.print("\n\nLSP22 not found");
       sen.lps22 = false;
     }
     else{
@@ -127,7 +187,7 @@ sensors initializeSensors(sensors sen){
 
   if(sen.ltr390){
     if(!LTR390.begin()){
-        Serial.print("\n\nLTR390 not found.");
+        Serial.print("\n\nLTR390 not found");
         sen.ltr390 = false;
     }
     else{
@@ -153,14 +213,14 @@ sensors initializeSensors(sensors sen){
   if(sen.scd40){
     SCD40.begin(Wire);
     if(SCD40.stopPeriodicMeasurement() || SCD40.startPeriodicMeasurement()){
-      Serial.print("\n\nSCD40 failed to respond.");
+      Serial.print("\n\nSCD40 failed to respond");
       sen.scd40 = false;
     }
   }
 
   if(sen.sht41){
     if(!SHT41.begin()){
-      Serial.print("\n\nSHT41 not found.");
+      Serial.print("\n\nSHT41 not found");
       sen.sht41 = false;
     }
     else{
@@ -171,7 +231,7 @@ sensors initializeSensors(sensors sen){
 
   if(sen.veml7700){
     if(!VEML7700.begin()){
-      Serial.print("\n\nVEML7700 not found.");
+      Serial.print("\n\nVEML7700 not found");
       sen.veml7700 = false;
     }
   }
@@ -202,8 +262,8 @@ parameters getSensorData(sensors sen){
   }
   else{
     param.aqi = 0.0f;
-    param.eCO2 = 0.0f;
-    param.tvoc = 0.0f;
+    param.aqi = 0.0f;
+    param.aqi = 0.0f;
   }
 
   if(sen.lps22){
@@ -224,12 +284,12 @@ parameters getSensorData(sensors sen){
 
   if(sen.ltr390 && LTR390.newDataAvailable()){
     param.uvRaw = LTR390.readUVS();
-    param.uvi = param.uvRaw / 2300.00;
+    param.uviLTR = param.uvRaw / 2300.00;
     param.alsLTR = LTR390.readALS();
   }
   else{
     param.uvRaw = 0.0f;
-    param.uvi = 0.0f;
+    param.uviLTR = 0.0f;
     param.alsLTR = 0.0f;
   }
 
@@ -282,6 +342,8 @@ parameters getSensorData(sensors sen){
     float h = (log10(param.humdSHT)-2.0)/0.4343+(17.62*param.tempSHT)/(243.12+param.tempSHT);
     param.dewPoint = 243.12*h/(17.62-h);
 
+    param.humdABS = 216.7*(param.humdSHT/100.0*6.112*exp(17.62*param.tempSHT/(243.12+param.tempSHT))/(275.15+param.tempSHT));
+
     param.heatIndex = 1.1*param.tempSHT + 5*(0.047*param.humdSHT - 7.1)/9;
 
     if((param.heatIndex+param.tempSHT)/2 >= 26.7){
@@ -298,6 +360,7 @@ parameters getSensorData(sensors sen){
   else{
     param.humdSHT = 0.0f;
     param.tempSHT = 0.0f;
+    param.humdABS = 0.0f;
     param.heatIndex = 0.0f;
   }
 
@@ -307,7 +370,6 @@ parameters getSensorData(sensors sen){
   else{
     param.alsVEML = 0.0f;
   }
-
 
   //Unit conversions
   if(unit.feet){
@@ -331,9 +393,10 @@ parameters getSensorData(sensors sen){
   else{}
 
   if(unit.fahrenheit){
-    param.tempLPS*(9/5)+32;
-    param.tempSCD*(9/5)+32;
-    param.tempSHT*(9/5)+32;
+    param.tempLPS = param.tempLPS*1.8+32;
+    param.tempSCD = param.tempSCD*1.8+32;
+    param.tempSHT = param.tempSHT*1.8+32;
+    param.heatIndex = param.heatIndex*1.8+32;
   }
 
   return param;

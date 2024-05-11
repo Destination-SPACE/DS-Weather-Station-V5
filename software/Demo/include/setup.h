@@ -12,7 +12,6 @@
 #include <SdFat.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <ArduinoYaml.h>
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
@@ -39,7 +38,7 @@
 #define TFT_RST 41
 #define TFT_BACKLIGHT 45
 #define TFT_I2C_POWER 7
-#define EEPROM_SCIO 9
+//#define EEPROM_SCIO 9
 
 //Units
 typedef struct{
@@ -78,6 +77,7 @@ typedef struct{
     float dewPoint;     // Dew point - SHT41
     float eCO2;         // Carbon-Dioxide (ENS160)
     float heatIndex;    // Heat-Index - SHT41
+    float humdABS;      // Absolute humidity - SHT41
     float humdSCD;      // Relative humidity - SCD40
     float humdSHT;      // Relative humidity - SHT41
     float pres;         // Absolute pressure - LPS22
@@ -86,7 +86,7 @@ typedef struct{
     float tempSHT;      // Temperature - SHT41
     float tvoc;         // Total Volatile Organic Compounds - ENS160
     float uvRaw;        // Raw UV Measurements - LTR390
-    float uvi;          // UV Index - LTR390
+    float uviLTR;          // UV Index - LTR390
     float voltage;      // Battery cell voltage - MAX1704
 } parameters;
 
@@ -107,7 +107,6 @@ typedef struct{
     int neoPixelVal;
 } configuration;
 
-void deserializeYAML(void);
 units getUnits(void);
 sensors getSensors(void);
 configuration getConfig(void);
@@ -125,6 +124,7 @@ extern parameters param;
 extern configuration config;
 extern SdFat SD;
 extern SdFile file;
+extern String alt, pres, temp, alt_file, pres_file, temp_file;
 
 //int32_t msc_read_cb(uint32_t, void*, uint32_t);
 //int32_t msc_write_cb(uint32_t, uint8_t*, uint32_t);

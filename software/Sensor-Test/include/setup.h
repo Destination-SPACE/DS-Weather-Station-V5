@@ -6,10 +6,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_Sensor.h>
+#include <ArduinoJson.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <SdFat.h>
-#include <ArduinoJson.h>
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
@@ -51,7 +51,7 @@ typedef struct{
     float alsLTR;    // Ambient light - LTR390
     float alsVEML;   // Ambient light - VEML700
     float alt;       // Altitude
-    float aqi;       // Air Quality Index (NowCast)
+    float aqi;       // Air Quality Index (Umweltbundesamt)
     float CO2;       // Carbon-Dioxide (SCD40)
     float dewPoint;  // Dew Point - SHT41
     float eCO2;      // Carbon-Dioxide (ENS160)
@@ -66,7 +66,6 @@ typedef struct{
     float tvoc;      // Total Volatile Organic Compounds - ENS160
     float uvRaw;     // Raw UV Measurements - LTR390
     float uviLTR;    // UV Index - LTR390
-    //float uviGUVAB;// UV Index - GUVA/B
 } parameters;
 
 extern SdFat SD;

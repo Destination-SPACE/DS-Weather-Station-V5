@@ -33,11 +33,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 TaskHandle_t Task0;
 TaskHandle_t Task1;
 
-SdFat SD;
-SdFile file;
-
-int hh, mm, ss;
-int clock_timer = 0;
+int clock_timer, hh, mm, ss;
 char fileName[13] = FILE_BASE_NAME "00.csv";
 
 //Declare system components
@@ -82,9 +78,9 @@ void setup() {
 
   Serial.print("\nChecking for SD card...");
   const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
-  if(digitalRead(SD_CD) == LOW){
+  if(digitalRead(SD_CD) == HIGH){
     Serial.print("\nPlease insert microSD card.");
-    while(digitalRead(SD_CD) == LOW){
+    while(digitalRead(SD_CD) == HIGH){
       delay(500);
     }
   }
@@ -104,6 +100,21 @@ void setup() {
   }
   Serial.print("\nSD card initialized!");
 
+  Serial.print("\nImporting configuration settings...");
+  config = getConfig();
+  Serial.print("\nDone.");
+  Serial.print("\nImporting sensor settings...");
+  sen = getSensors();
+  Serial.print("\nDone.");
+  Serial.print("\nImporting unit definitions...");
+  unit = getUnits();
+  Serial.print("\nDone.");
+  Serial.print("\nInitializing sensors...");
+  sen = initializeSensors(sen);
+  Serial.print("\nDone.");
+
+  Serial.print("\n\nInitialization complete!");
+
   Serial.print("\nCreating CSV file...");
   if(baseNameSize > 6){
     Serial.print("\n\nFile base name too long.");
@@ -121,30 +132,17 @@ void setup() {
     }
   }
   if(file.open(fileName, O_WRONLY | O_CREAT | O_EXCL)){
-    file.println(F("Time (s),Temp (C),Hum (%),HI (C), Dew Point (C), PRES (hPa),ALT (m),CO2 (ppm), eCO2 (ppm), TVOC (ppb),AQI (1-5), RAW UV, UVI (0-11),LUX (k-lux)\n"));
+    char buffer[512];
+    sprintf(buffer, "Time (s),Temp %s,Hum (%),HI %s, Dew Point %s, PRES %s,ALT %s,CO2 (ppm), eCO2 (ppm), TVOC (ppb),AQI (1-5), RAW UV, UVI (0-11),LUX (k-lux)\n", temp, temp, temp, pres, alt);
+    file.println(F(buffer));
     Serial.print("\nCSV file created!");
   }
   else{
     Serial.print("\n\nError opening file.");
   }
-
-  Serial.print("\nImporting config.yaml...");
-  deserializeYAML();
-  Serial.print("\nYAML file deserialized!");
-
-  config = getConfig();
-  Serial.print("\nConfigurations imported!");
-
-  Serial.print("\nConfiguring settings...");
-  unit = getUnits();
-  sen = getSensors();
-
-  Serial.print("\nInitializing sensors...");
-  sen = initializeSensors(sen);
-
-  Serial.print("\n\nInitialization complete!");
-
-  Serial.print("\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) | (%) | (°C) | hPa  | (m) |(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+");
+  char buffer[1024];
+  sprintf(buffer,"\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| %s |(pct)| %s |%s|%s|(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+", temp, temp, pres, alt); // Print header to terminal
+  Serial.print(buffer);
 
 }
 
@@ -168,13 +166,13 @@ void loop0(void * parameter){
     
     char buffer[1024];
 
-    sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uvi, param.alsLTR);
+    sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR);
 
     Serial.print(buffer);
 
     char fileBuffer[1024];
 
-    sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uvi, param.alsVEML);
+    sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uviLTR, param.alsVEML);
 
     while(true){
       if(millis() - time_prev >= config.refreshRate) break;

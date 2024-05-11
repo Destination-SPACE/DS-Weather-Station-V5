@@ -1,7 +1,5 @@
 #include "setup.h"
 
-float aqiPrev = 0.0f;
-
 units unit;
 sensors sen;
 parameters param;
