@@ -86,7 +86,7 @@ void loop() {
       
   char buffer[1024]; // Create a 1024 bit character buffer
 
-  sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f| %4.1f | %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR); // Add sensor data to the buffer
+  sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f| %4.1f | %4.0f |%5.1f| %4.0f| %4.0f |   %1.0f   | %5.2f |%6.2f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsVEML); // Add sensor data to the buffer
 
   Serial.print(buffer); // Print sensor data
 
