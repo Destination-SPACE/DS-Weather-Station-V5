@@ -4,12 +4,12 @@ DESTINATION WEATHER FEATHER WING EXAMPLE - DEMO
 This is an example sketch for the Destination Weather FeatherWing remote sensing
 platform to test the microSD card reader.
 
-modified 2024-03-12
+modified 2024-05-13
 by Madison Gleydura
 
 MIT LICENSE AGREEMENT
 
-Copyright © 2023 Destination SPACE Inc.
+Copyright © 2024 Destination SPACE Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the “Software”), to deal in
@@ -59,8 +59,8 @@ void setup() {
 
   //Initialize core loops
   Serial.print("\nInitializing cores...");
-  xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 0, &Task0, 0);
-  xTaskCreatePinnedToCore(loop1, "Task1", 1000, NULL, 0, &Task1, 1);
+  xTaskCreatePinnedToCore(task0code, "Task0", 10000, NULL, 1, &Task0, 0);
+  xTaskCreatePinnedToCore(task1code, "Task1", 1000, NULL, 1, &Task1, 1);
   Serial.print("\nCores initialized!");
 
   Serial.print("\nInitializing NeoPixels...");
@@ -78,11 +78,12 @@ void setup() {
 
   Serial.print("\nChecking for SD card...");
   const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
-  if(digitalRead(SD_CD) == HIGH){
+  if(digitalRead(SD_CD)){
     Serial.print("\nPlease insert microSD card.");
-    while(digitalRead(SD_CD) == HIGH){
-      delay(500);
-    }
+    //while(digitalRead(SD_CD) == HIGH){
+      //delay(500);
+    //}
+    while(true);
   }
   else{
     Serial.print("\nSD card detected!");
@@ -146,7 +147,7 @@ void setup() {
 
 }
 
-void loop0(void * parameter){
+void task0code(void * parameter){
   for(;;){
     int time_prev = millis();
     param = getSensorData(sen);
@@ -166,7 +167,7 @@ void loop0(void * parameter){
     
     char buffer[1024];
 
-    sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsLTR);
+    sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsVEML);
 
     Serial.print(buffer);
 
@@ -174,14 +175,19 @@ void loop0(void * parameter){
 
     sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uviLTR, param.alsVEML);
 
+    file.write(fileBuffer);
+    file.close();
+
     while(true){
-      if(millis() - time_prev >= config.refreshRate) break;
+      if(millis() - time_prev >= config.refreshRate){
+         break;
+      }
       delay(5);
     }
   }
 }
 
-void loop1(void * parameter){
+void task1code(void * parameter){
     for(;;){
 
     }

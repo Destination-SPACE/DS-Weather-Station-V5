@@ -234,6 +234,11 @@ sensors initializeSensors(sensors sen){
       Serial.print("\n\nVEML7700 not found");
       sen.veml7700 = false;
     }
+    else{
+      VEML7700.setLowThreshold(10000);
+      VEML7700.setHighThreshold(20000);
+      VEML7700.interruptEnable(true);
+    }
   }
 
   return sen;
