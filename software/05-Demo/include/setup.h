@@ -12,6 +12,7 @@
 #include <SdFat.h>
 #include <SPI.h>
 #include <Wire.h>
+#include <tusb.h>
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
@@ -38,6 +39,7 @@
 #define TFT_RST 41
 #define TFT_BACKLIGHT 45
 #define TFT_I2C_POWER 7
+#define USB_SERIAL_JTAG_LINE_STATE 0x10
 //#define EEPROM_SCIO 9
 
 //Units
@@ -107,27 +109,59 @@ typedef struct{
     int neoPixelVal;
 } configuration;
 
+//Button States
+typedef struct{
+    bool BTN0_State;
+    bool BTN1_State;
+    bool BTN2_State;
+} btnStates;
+
+//Set types for functions
+sensors initializeSensors(sensors);
+parameters getSensorData(sensors);
 units getUnits(void);
 sensors getSensors(void);
 configuration getConfig(void);
+btnStates readButtons(void);
 
-//Set variable types for functions
-sensors initializeSensors(sensors);
-parameters getSensorData(sensors);
 void initializeTFT(void);
-void loop0(void * parameter);
-void loop1(void * parameter);
+void sensorScr(void);
+void expansionScr(void);
+void sysHealthScr(void);
+void infoScr(void);
 
+void dispSensor(void);
+void dispExpansion(void);
+void dispSysHealth(void);
+
+void navBar(void);
+
+//Define structure variables
 extern units unit;
 extern sensors sen;
 extern parameters param;
 extern configuration config;
+extern btnStates btnState;
+
 extern SdFat SD;
 extern SdFile file;
 extern String alt, pres, temp, alt_file, pres_file, temp_file;
 
+extern sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN, SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
+
 //int32_t msc_read_cb(uint32_t, void*, uint32_t);
 //int32_t msc_write_cb(uint32_t, uint8_t*, uint32_t);
 //void msc_flush_cb();
+
+extern ScioSense_ENS160 ENS160;
+extern Adafruit_LPS22 LPS22;
+extern Adafruit_LTR390 LTR390;
+extern Adafruit_MAX17048 MAX17048;
+extern SensirionI2CScd4x SCD40;
+extern Adafruit_SHT4x SHT41;
+extern Adafruit_VEML7700 VEML7700;
+extern Adafruit_ST7789 tft;
+
+extern String presDisp, tempDisp;
 
 #endif
