@@ -8,7 +8,7 @@ configuration config;
 SdFat SD;
 SdFile file;
 
-String alt, pres, temp, alt_file, pres_file, temp_file;
+String alt, pres, temp, alt_file, pres_file, temp_file, presDisp, tempDisp;
 
 ScioSense_ENS160 ENS160(ENS160_I2CADDR_0);
 Adafruit_LPS22 LPS22;
@@ -17,8 +17,7 @@ Adafruit_MAX17048 MAX17048;
 SensirionI2CScd4x SCD40;
 Adafruit_SHT4x SHT41 = Adafruit_SHT4x();
 Adafruit_VEML7700 VEML7700 = Adafruit_VEML7700();
-Adafruit_ST7789 TFT = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-
+Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 //Adafruit_USBD_MSC USB_MSC;
 
 configuration getConfig(void){
@@ -93,36 +92,44 @@ units getUnits(void){
     if(unit.pascal){
       pres = " (Pa) ";
       pres_file = "(Pa)";
+      presDisp = "Pa";
     }
     else if(unit.mbar){
       pres = "(mbar)";
       pres_file = "(mbar)";
+      presDisp = "mbar";
     }
     else if(unit.kpa){
       pres = "(kPa.)";
       pres_file = "(kPa)";
+      presDisp = "kPa";
     }
     else if(unit.inhg){
       pres = "(inHg)";
       pres_file = "(inHg)";
+      presDisp = "inHg";
     }
     else if(unit.mmhg){
       pres = "(mmHg)";
       pres_file = "(mmHg)";
+      presDisp = "mmHg";
     }
     else if(unit.psi){
       pres = "(Psi.)";
       pres_file = "(psi)";
+      presDisp = "Psi";
     }
     else{}
 
     if(unit.celsius){
       temp = "(°C)";
       temp_file = "(C)";
+      tempDisp = "C";
     }
     else{
       temp = "(°F)";
       temp_file = "(F)";
+      tempDisp = "F";
     }
 
   }
@@ -244,18 +251,6 @@ sensors initializeSensors(sensors sen){
   return sen;
 }
 
-void initializeTFT(){
-  pinMode(TFT_BACKLIGHT, OUTPUT);
-  pinMode(TFT_I2C_POWER, OUTPUT);
-
-  digitalWrite(TFT_BACKLIGHT, HIGH);
-  digitalWrite(TFT_I2C_POWER, HIGH);
-
-  TFT.init(135, 240); // Define TFT resolution
-  TFT.setRotation(3); // CCW orientation
-  TFT.fillScreen(ST77XX_BLACK); // Clear screen
-}
-
 parameters getSensorData(sensors sen){
   if(sen.ens160 && ENS160.available()){
     ENS160.measure(true);
@@ -272,7 +267,6 @@ parameters getSensorData(sensors sen){
   }
 
   if(sen.lps22){
-    sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN;
     LPS22.getEvent(&LPS22_PRESSURE_SEN, &LPS22_TEMPERATURE_SEN);
 
     param.tempLPS = LPS22_TEMPERATURE_SEN.temperature;
@@ -338,7 +332,6 @@ parameters getSensorData(sensors sen){
   }
 
   if(sen.sht41){
-    sensors_event_t SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
     SHT41.getEvent(&SHT41_HUMIDITY_SEN, &SHT41_TEMPERATURE_SEN);
 
     param.humdSHT = SHT41_HUMIDITY_SEN.relative_humidity;
