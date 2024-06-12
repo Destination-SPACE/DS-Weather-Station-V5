@@ -1,8 +1,10 @@
 <div align="center">
     <img src="docs/assets/Destination Space Logo.png" width="200" height="auto"/>
     <h1>Destination Weather Station v5.0</h1>
-    <p>An Open Source Remote Sensing Platform Compatible with Adafruit Feather and SparkFun Thing platforms</p>
+    <p>An Open Source In-Situ Sensing Platform Compatible with Adafruit Feather and SparkFun Thing platforms</p>
 </div>
+
+<img src="docs/assets/pinoutDiagram.png">
 
 ## 🌟 About the Project
 Destination Weather Station is the the latest version of remote sensing tools developed to teach students across the southeastern United States about climate science and remote sensing.
