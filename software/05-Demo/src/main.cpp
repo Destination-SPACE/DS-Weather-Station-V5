@@ -4,7 +4,7 @@ DESTINATION WEATHER FEATHER WING EXAMPLE - DEMO
 This is an example sketch for the Destination Weather FeatherWing remote sensing
 platform to test the microSD card reader.
 
-modified 2024-05-13
+modified 2024-06-14
 by Madison Gleydura
 
 MIT LICENSE AGREEMENT
@@ -76,18 +76,36 @@ void setup() {
   Serial.print("\nTFT display initialized!");
 
   Serial.print("\nChecking for SD card...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setTextSize(1);
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setCursor(0,0);
+  tft.print("Checking for SD card...");
+
   const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
   if(digitalRead(SD_CD)){
     Serial.print("\nPlease insert microSD card.");
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0,0);
+    tft.print("Please insert microSD card.");
     while(true);
   }
   else{
     Serial.print("\nSD card detected!");
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0,0);
+    tft.print("SD card detected");
   }
 
   Serial.print("\nInitializing SD card...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Initialized SD card...");
   if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
     Serial.print("\nSD card not responding.");
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0,0);
+    tft.print("SD card not responding.");
     while(true){
       if(SD.begin(SD_CS, SD_SCK_MHZ(50))){
         break;
@@ -96,23 +114,44 @@ void setup() {
     }
   }
   Serial.print("\nSD card initialized!");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("SD card initialized!");
 
   Serial.print("\nImporting configuration settings...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Importing configuration settings...");
   config = getConfig();
   Serial.print("\nDone.");
   Serial.print("\nImporting sensor settings...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Importing sensor settings...");
   sen = getSensors();
   Serial.print("\nDone.");
   Serial.print("\nImporting unit definitions...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Importing unit definitions...");
   unit = getUnits();
   Serial.print("\nDone.");
   Serial.print("\nInitializing sensors...\n");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Initializing sensors...");
   sen = initializeSensors(sen);
   Serial.print("\nDone.");
 
   Serial.print("\nCreating CSV file...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Creating CSV file...");
   if(baseNameSize > 6){
     Serial.print("\n\nFile base name too long.");
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0,0);
+    tft.print("File base name too long.");
   }
   while(SD.exists(fileName)){
     if(fileName[baseNameSize + 1] != '9'){
@@ -124,6 +163,9 @@ void setup() {
     }
     else{
       Serial.print("\n\nCan't create file name.");
+      tft.fillScreen(ST77XX_BLACK);
+      tft.setCursor(0,0);
+      tft.print("Can't create file name.");
     }
   }
   if(file.open(fileName, O_WRONLY | O_CREAT | O_EXCL)){
@@ -131,13 +173,22 @@ void setup() {
     sprintf(buffer, "Time (s),Temp %s,Hum (%),HI %s, Dew Point %s, PRES %s,ALT %s,CO2 (ppm), eCO2 (ppm), TVOC (ppb),AQI (1-5), RAW UV, UVI (0-11),LUX (k-lux)\n", temp, temp, temp, pres, alt);
     file.println(F(buffer));
     Serial.print("\nCSV file created!");
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0,0);
+    tft.print("CSV file created!");
   }
   else{
     Serial.print("\n\nError opening file.");
+    tft.fillScreen(ST77XX_BLACK);
+    tft.setCursor(0,0);
+    tft.print("Error opening file.");
   }
 
   //Initialize core loops
   Serial.print("\nInitializing cores...");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Initializing cores...");
   xTaskCreatePinnedToCore(task0code, "Task0", 10000, NULL, 1, &Task0, 0);
   delay(500);
   xTaskCreatePinnedToCore(task1code, "Task1", 10000, NULL, 1, &Task1, 1);
@@ -145,6 +196,9 @@ void setup() {
   Serial.print("\nCores initialized!");
 
   Serial.print("\n\nInitialization complete!");
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setCursor(0,0);
+  tft.print("Initialization complete!");
 }
 
 void task0code(void * parameter){
