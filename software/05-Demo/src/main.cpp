@@ -40,9 +40,15 @@ char fileName[13] = FILE_BASE_NAME "00.csv";
 Adafruit_NeoPixel PIXEL_FEATHER(1, NEO_PIXEL_FEATHER);
 Adafruit_NeoPixel PIXEL_WING(1, NEO_PIXEL_WING, NEO_GRB + NEO_KHZ800);
 
+void task0code(void * parameter);
+void task1code(void * parameter);
+
+sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN, SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
+
+
 void setup() {
   Serial.begin(115200);
-  while(!Serial);
+  //while(!Serial);
   Serial.print("Destination Weather Station v5!");
 
   //Setup Digital IO
@@ -52,16 +58,9 @@ void setup() {
   pinMode(BUTTON2, INPUT_PULLDOWN);
   pinMode(LED, OUTPUT);
   pinMode(LPS22_INT, INPUT);
-  pinMode(SD_CD, INPUT);
   pinMode(NEO_PIXEL_FEATHER, OUTPUT);
   pinMode(NEO_PIXEL_WING, OUTPUT);
   Serial.print("\nDigital IO setup complete!");
-
-  //Initialize core loops
-  Serial.print("\nInitializing cores...");
-  xTaskCreatePinnedToCore(task0code, "Task0", 10000, NULL, 1, &Task0, 0);
-  xTaskCreatePinnedToCore(task1code, "Task1", 1000, NULL, 1, &Task1, 1);
-  Serial.print("\nCores initialized!");
 
   Serial.print("\nInitializing NeoPixels...");
   PIXEL_FEATHER.begin(); // Initialize built-in NeoPixel
@@ -80,9 +79,6 @@ void setup() {
   const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
   if(digitalRead(SD_CD)){
     Serial.print("\nPlease insert microSD card.");
-    //while(digitalRead(SD_CD) == HIGH){
-      //delay(500);
-    //}
     while(true);
   }
   else{
@@ -110,11 +106,9 @@ void setup() {
   Serial.print("\nImporting unit definitions...");
   unit = getUnits();
   Serial.print("\nDone.");
-  Serial.print("\nInitializing sensors...");
+  Serial.print("\nInitializing sensors...\n");
   sen = initializeSensors(sen);
   Serial.print("\nDone.");
-
-  Serial.print("\n\nInitialization complete!");
 
   Serial.print("\nCreating CSV file...");
   if(baseNameSize > 6){
@@ -141,13 +135,20 @@ void setup() {
   else{
     Serial.print("\n\nError opening file.");
   }
-  char buffer[1024];
-  sprintf(buffer,"\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| %s |(pct)| %s |%s|%s|(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+", temp, temp, pres, alt); // Print header to terminal
-  Serial.print(buffer);
 
+  //Initialize core loops
+  Serial.print("\nInitializing cores...");
+  xTaskCreatePinnedToCore(task0code, "Task0", 10000, NULL, 1, &Task0, 0);
+  delay(500);
+  xTaskCreatePinnedToCore(task1code, "Task1", 10000, NULL, 1, &Task1, 1);
+  delay(500);
+  Serial.print("\nCores initialized!");
+
+  Serial.print("\n\nInitialization complete!");
 }
 
 void task0code(void * parameter){
+  delay(5000);
   for(;;){
     int time_prev = millis();
     param = getSensorData(sen);
@@ -164,17 +165,12 @@ void task0code(void * parameter){
         hh = hh + 1;
       }
     }
-    
-    char buffer[1024];
-
-    sprintf(buffer,"\n|%02d:%02d:%02d| %4.1f |%5.2f|%6.2f| %4.0f |%5.1f| %4.0f| %4.0f | %5.1f | %5.2f |%7.3f|", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.pres, param.alt, param.CO2, param.tvoc, param.aqi, param.uviLTR, param.alsVEML);
-
-    Serial.print(buffer);
 
     char fileBuffer[1024];
 
-    sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uviLTR, param.alsVEML);
+    sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uviLTR, param.alsVEML);
 
+    file.open(fileName);
     file.write(fileBuffer);
     file.close();
 
@@ -188,11 +184,83 @@ void task0code(void * parameter){
 }
 
 void task1code(void * parameter){
-    for(;;){
+  delay(5000);
+  sensorScr();
+  for(;;){
+    homeScreen:
+    dispSensor();
+    btnState = readButtons();
 
+    if(btnState.BTN0_State){  // Expansion sensor screen
+      btnState.BTN0_State = false;
+      expansionScr();
+      while(true){
+        dispExpansion();
+        btnState = readButtons();
+
+        if(btnState.BTN0_State){  // System health screen
+          btnState.BTN0_State = false;
+          sysHealthScr();
+          while(true){
+            dispSysHealth();
+            btnState = readButtons();
+
+            if(btnState.BTN0_State){  // Device information screen
+              btnState.BTN0_State = false;
+              infoScr();
+              while(true){
+                btnState = readButtons();
+
+                if(btnState.BTN0_State){
+                  btnState.BTN0_State = false;
+                  sensorScr();
+                  goto homeScreen;
+                }
+                else if(btnState.BTN1_State){
+                  btnState.BTN1_State = false;
+                }
+                else if(btnState.BTN2_State){
+                  btnState.BTN2_State = false;
+                  goto homeScreen;
+                }
+              }
+            }
+            else if(btnState.BTN1_State){
+              btnState.BTN1_State = false;
+            }
+            else if(btnState.BTN2_State){
+              btnState.BTN2_State = false;
+              sensorScr();
+              goto homeScreen;
+            }
+            else{
+            }
+          }
+        }
+        else if(btnState.BTN1_State){
+          btnState.BTN1_State = false;
+        }
+        else if(btnState.BTN2_State){
+          btnState.BTN2_State = false;
+          sensorScr();
+          goto homeScreen;
+        }
+        else{
+        }
+      }
     }
+    else if(btnState.BTN1_State){
+      btnState.BTN1_State = false;
+    }
+    else if(btnState.BTN2_State){
+      btnState.BTN2_State = false;
+      sensorScr();
+      goto homeScreen;
+    }
+    else{
+    }
+  }
 }
 
 void loop() {
-  
 }
