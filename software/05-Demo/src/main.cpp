@@ -60,6 +60,7 @@ void setup() {
   pinMode(LPS22_INT, INPUT);
   pinMode(NEO_PIXEL_FEATHER, OUTPUT);
   pinMode(NEO_PIXEL_WING, OUTPUT);
+  pinMode(SD_CD, INPUT);
   Serial.print("\nDigital IO setup complete!");
 
   Serial.print("\nInitializing NeoPixels...");
@@ -83,12 +84,16 @@ void setup() {
   tft.print("Checking for SD card...");
 
   const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
-  if(digitalRead(SD_CD)){
+  if(digitalRead(digitalRead(SD_CD) == 1)){
     Serial.print("\nPlease insert microSD card.");
     tft.fillScreen(ST77XX_BLACK);
     tft.setCursor(0,0);
     tft.print("Please insert microSD card.");
-    while(true);
+    while(true){
+      if(digitalRead(SD_CD) == 0){
+        break;
+      }
+    }
   }
   else{
     Serial.print("\nSD card detected!");
