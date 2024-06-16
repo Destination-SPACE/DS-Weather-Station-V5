@@ -13,6 +13,8 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <tusb.h>
+#include <WiFi.h>
+#include "ESPAsyncWebServer.h"
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
@@ -96,8 +98,8 @@ typedef struct{
 typedef struct{
     String studentName;
     int refreshRate;
-    String wifiSSID;
-    String wifiPASS;
+    const char* wifiSSID;
+    const char* wifiPASS;
     bool neoPixelRGB;
     bool neoPixelHSV;
     int neoPixelRed;
