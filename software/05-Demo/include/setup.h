@@ -94,10 +94,10 @@ typedef struct{
 
 //Configuration
 typedef struct{
-    const char* studentName;
+    String studentName;
     int refreshRate;
-    const char* wifiSSID;
-    const char* wifiPASS;
+    String wifiSSID;
+    String wifiPASS;
     bool neoPixelRGB;
     bool neoPixelHSV;
     int neoPixelRed;

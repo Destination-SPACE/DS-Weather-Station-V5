@@ -12,6 +12,7 @@ char  tempBuffer[64],
       ALSBuffer[64],
       BattPctBuffer[64],
       BattVBuffer[64],
+      NameBuffer[64],
       *tempBufferPrev,
       *presBufferPrev,
       *humdBufferPrev,
@@ -92,8 +93,6 @@ void sysHealthScr(){
 void infoScr(){
   navBar();
 
-  char buffer[strlen(config.studentName)+1];
-
   tft.setTextSize(2);
   tft.setCursor(20,0);
   tft.setTextColor(ST77XX_RED);
@@ -104,7 +103,7 @@ void infoScr(){
   tft.setCursor(20,60);
   tft.print("Weather Station v5");
   tft.setCursor(20,80);
-  tft.print(strcpy(buffer,config.studentName));
+  tft.print(config.studentName);
 }
 
 void dispSensor(){
