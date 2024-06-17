@@ -191,6 +191,79 @@ void setup() {
     tft.print("Error opening file.");
   }
 
+  WiFi.softAP(config.wifiSSID, config.wifiPASS);
+  IPAddress IP = WiFi.softAPIP();
+
+  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
+    char tempSend[16];
+    dtostrf(uint32_t(param.tempSHT), 4, 2, tempSend);
+    Serial.println(tempSend);
+    request->send_P(200, "test/plain", tempSend);
+  });
+  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
+    char humdSend[16];
+    dtostrf(uint32_t(param.humdSHT), 4, 2, humdSend);
+    request->send_P(200, "test/plain", humdSend);
+  });
+  server.on("/heatIndex", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.heatIndex), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/dewPoint", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.dewPoint), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.pres), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/altitude", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.alt), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/CO2", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.CO2), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/eCO2", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.eCO2), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/TVOC", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.tvoc), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/AQI", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.aqi), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/uvRaw", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.uvRaw), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/UVI", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.uviLTR), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+  server.on("/ALS", HTTP_GET, [](AsyncWebServerRequest *request){
+    char presSend[16];
+    dtostrf(uint32_t(param.alsVEML), 4, 2, presSend);
+    request->send_P(200, "test/plain", presSend);
+  });
+
+  server.begin();
+
+
   //Initialize core loops
   Serial.print("\nInitializing cores...");
   tft.fillScreen(ST77XX_BLACK);
@@ -201,93 +274,6 @@ void setup() {
   xTaskCreatePinnedToCore(task1code, "Task1", 10000, NULL, 1, &Task1, 1);
   delay(500);
   Serial.print("\nCores initialized!");
-
-  Serial.print("\nSetting access point...");
-  tft.fillScreen(ST77XX_BLACK);
-  tft.setCursor(0,0);
-  tft.print("Setting access point...");
-  WiFi.softAP(config.wifiSSID, config.wifiPASS);
-  IPAddress IP = WiFi.softAPIP();
-
-  server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
-    char tempSend[16];
-    dtostrf(param.tempSHT, 4, 2, tempSend);
-    request->send_P(200, "test/plain", tempSend);
-  });
-
-  server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.humdSHT, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/heatIndex", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.heatIndex, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/dewPoint", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.dewPoint, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.pres, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/altitude", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.alt, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/CO2", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.CO2, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/eCO2", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.eCO2, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/TVOC", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.tvoc, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/AQI", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.aqi, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/uvRaw", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.uvRaw, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/UVI", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.uviLTR, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.on("/ALS", HTTP_GET, [](AsyncWebServerRequest *request){
-    char dataToSend[16];
-    dtostrf(param.alsVEML, 4, 2, dataToSend);
-    request->send_P(200, "test/plain", dataToSend);
-  });
-
-  server.begin();
 
   Serial.print("\n\nInitialization complete!");
   tft.fillScreen(ST77XX_BLACK);
