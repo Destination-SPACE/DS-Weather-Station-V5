@@ -2,14 +2,14 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-const char* ssid = "DS-WX-STN-01";
+const char* ssid = "station";
 const char* password = "password";
 
 const char* temperature_server = "http://192.168.4.1/temperature";
 const char* humidity_server = "http://192.168.4.1/humidity";
 const char* heatIndex_server = "http://192.168.4.1/heatIndex";
 const char* dewPoint_server = "http://192.168.4.1/dewPoint";
-const char* pressure_server = "http://192.168.4.1/heatIndex";
+const char* pressure_server = "http://192.168.4.1/pressure";
 const char* altitude_server = "http://192.168.4.1/altitude";
 const char* co2_server = "http://192.168.4.1/CO2";
 const char* eco2_server = "http://192.168.4.1/eCO2";
@@ -73,7 +73,7 @@ void loop() {
       uvi = HTTP_Request(uvi_server);
       als = HTTP_Request(als_server);
       char buffer[128];
-      sprintf(buffer,"%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", temperature, humidity, heatIndex, dewPoint, pressure, altitude, co2, eco2, tvoc, aqi, uvRaw, uvi, als);
+      sprintf(buffer,"\n%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", temperature, humidity, heatIndex, dewPoint, pressure, altitude, co2, eco2, tvoc, aqi, uvRaw, uvi, als);
       Serial.print(buffer);
       previousMillis = current_time;
     }
