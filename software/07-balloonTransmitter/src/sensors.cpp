@@ -21,7 +21,7 @@ Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 //Adafruit_USBD_MSC USB_MSC;
 
 configuration getConfig(void){
-  if(!file.open("config.json", FILE_READ)){
+  if(!file.open("config.json", O_RDONLY)){
     Serial.print("\nFailed to open config.json or file does not exist");
   }
   if(file){
@@ -57,7 +57,7 @@ configuration getConfig(void){
 }
 
 units getUnits(void){
-  if(!file.open("config.json", FILE_READ)){
+  if(!file.open("config.json", O_RDONLY)){
     Serial.print("\nFailed to open config.json or file does not exist");
   }
   if(file){
@@ -141,7 +141,7 @@ units getUnits(void){
 }
 
 sensors getSensors(void){
-  if(!file.open("config.json", FILE_READ)){
+  if(!file.open("config.json", O_RDONLY)){
     Serial.print("\nFailed to open config.json or file does not exist");
   }
   if(file){
