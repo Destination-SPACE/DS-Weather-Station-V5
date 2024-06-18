@@ -83,7 +83,7 @@ void setup() {
   tft.print("Checking for SD card...");
 
   const uint8_t baseNameSize = sizeof(FILE_BASE_NAME) - 1;
-  if(digitalRead(digitalRead(SD_CD) == 1)){
+  if(!digitalRead(SD_CD)){
     Serial.print("\nPlease insert microSD card.");
     tft.fillScreen(ST77XX_BLACK);
     tft.setCursor(0,0);
@@ -172,10 +172,11 @@ void setup() {
       tft.print("Can't create file name.");
     }
   }
-  if(file.open(fileName, O_WRONLY | O_CREAT | O_EXCL)){
+  if(file.open(fileName, O_RDWR | O_CREAT | O_AT_END)){
     char buffer[512];
     sprintf(buffer, "Time (s),Temp %s,Hum (%),HI %s, Dew Point %s, PRES %s,ALT %s,CO2 (ppm), eCO2 (ppm), TVOC (ppb),AQI (1-5), RAW UV, UVI (0-11),LUX (k-lux)\n", temp, temp, temp, pres, alt);
     file.println(F(buffer));
+    file.close();
     Serial.print("\nCSV file created!");
     tft.fillScreen(ST77XX_BLACK);
     tft.setCursor(0,0);
@@ -227,10 +228,13 @@ void task0code(void * parameter){
     char fileBuffer[1024];
 
     sprintf(fileBuffer,"%02d:%02d:%02d,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f", hh, mm, ss, param.tempSHT, param.humdSHT, param.heatIndex, param.dewPoint, param.pres, param.alt, param.CO2, param.eCO2, param.tvoc, param.aqi, param.uvRaw, param.uviLTR, param.alsVEML);
-
-    file.open(fileName);
-    file.write(fileBuffer);
-    file.close();
+    
+    if(file.open(fileName, O_RDWR | O_CREAT | O_AT_END)){
+      file.println(fileBuffer);
+      
+      file.close();
+    }
+    
 
     while(true){
       if(millis() - time_prev >= config.refreshRate){
