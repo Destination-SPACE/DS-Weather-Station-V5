@@ -45,7 +45,6 @@ void task1code(void * parameter);
 
 sensors_event_t LPS22_TEMPERATURE_SEN, LPS22_PRESSURE_SEN, SHT41_TEMPERATURE_SEN, SHT41_HUMIDITY_SEN;
 
-
 void setup() {
   Serial.begin(115200);
   //while(!Serial);

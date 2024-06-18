@@ -37,8 +37,10 @@ void setup() {
   Serial.begin(115200);
   while(!Serial);
   Wire.begin();
+  
+  pinMode(SD_CD, INPUT);
 
-  if(digitalRead(SD_CD)){
+  if(!digitalRead(SD_CD)){
     Serial.print("\nPlease insert SD card...");
     while(true);
   }
