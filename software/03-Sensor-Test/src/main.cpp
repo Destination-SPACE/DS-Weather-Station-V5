@@ -43,7 +43,7 @@ void setup() {
     while(true);
   }
 
-  if(!SD.begin(SD_CS)){
+  if(!SD.begin(SD_CS, SD_SCK_MHZ(50))){
     Serial.print("\nSD card initialization failed...");
   }
   else{

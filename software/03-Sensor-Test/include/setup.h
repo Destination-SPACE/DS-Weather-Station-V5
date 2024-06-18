@@ -7,9 +7,10 @@
 #include <Adafruit_NeoPixel.h>
 #include <Adafruit_Sensor.h>
 #include <ArduinoJson.h>
+#include <SdFat.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <SdFat.h>
+
 
 //Sensor libraries
 #include <Adafruit_LPS2X.h>
