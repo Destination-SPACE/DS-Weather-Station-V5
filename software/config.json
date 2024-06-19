@@ -34,17 +34,17 @@
       "PSI": false
     },
     "TEMPERATURE": {
-      "CELSIUS": false,
-      "FAHRENHEIT": true
+      "CELSIUS": true,
+      "FAHRENHEIT": false
     }
   },
   "SENSORS": {
-    "ENS160": true,
+    "ENS160": false,
     "LPS22": true,
-    "LTR390": true,
-    "MAX17048": true,
-    "SCD40": true,
+    "LTR390": false,
+    "MAX17048": false,
+    "SCD40": false,
     "SHT41": true,
-    "VEML7700": true
+    "VEML7700": false
   }
 }
