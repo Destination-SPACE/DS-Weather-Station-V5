@@ -107,10 +107,10 @@ void infoScr(){
   tft.setTextSize(1);
   tft.setCursor(20, 80);
   tft.print("SSID: ");
-  tft.print(config.wifiSSID);
+  tft.print(config.wifiSSID.c_str());
   tft.setCursor(20, 100);
   tft.print("PASS: ");
-  tft.print(config.wifiPASS);
+  tft.print(config.wifiPASS.c_str());
 }
 
 void dispSensor(){

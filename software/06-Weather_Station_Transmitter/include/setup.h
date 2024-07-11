@@ -11,6 +11,7 @@
 #include <ArduinoJson.h>
 #include <SdFat.h>
 #include <SPI.h>
+#include <string>
 #include <Wire.h>
 #include <tusb.h>
 #include <WiFi.h>
@@ -97,8 +98,8 @@ typedef struct{
 typedef struct{
     String studentName;
     int refreshRate;
-    String wifiSSID;
-    String wifiPASS;
+    std::string wifiSSID;
+    std::string wifiPASS;
     bool neoPixelRGB;
     bool neoPixelHSV;
     int neoPixelRed;

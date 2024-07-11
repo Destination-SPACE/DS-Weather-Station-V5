@@ -4,7 +4,7 @@ DESTINATION WEATHER FEATHER WING EXAMPLE - DEMO
 This is an example sketch for the Destination Weather FeatherWing remote sensing
 platform to test the microSD card reader.
 
-modified 2024-07-06
+modified 2024-07-11
 by Madison Gleydura
 
 MIT LICENSE AGREEMENT
@@ -175,10 +175,11 @@ void setup() {
       tft.print("Can't create file name.");
     }
   }
-  if(file.open(fileName, O_WRONLY | O_CREAT | O_EXCL)){
+  if(file.open(fileName, O_RDWR | O_CREAT | O_AT_END)){
     char buffer[512];
     sprintf(buffer, "Time (s),Temp %s,Hum (%),HI %s, Dew Point %s, PRES %s,ALT %s,CO2 (ppm), eCO2 (ppm), TVOC (ppb),AQI (1-5), RAW UV, UVI (0-11),LUX (k-lux)\n", temp, temp, temp, pres, alt);
     file.println(F(buffer));
+    file.close();
     Serial.print("\nCSV file created!");
     tft.fillScreen(ST77XX_BLACK);
     tft.setCursor(0,0);
