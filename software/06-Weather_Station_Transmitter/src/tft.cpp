@@ -114,8 +114,8 @@ void infoScr(){
 }
 
 void dispSensor(){
-  sprintf(tempBuffer, "%.1f\367%s", param.tempSHT, tempDisp);
-  sprintf(presBuffer, "%5.1f%s", param.pres, presDisp);
+  sprintf(tempBuffer, "%.1f\367%sC", param.tempSHT);
+  sprintf(presBuffer, "%5.1f%smbar", param.pres);
   sprintf(humdBuffer, "%.1f%%", param.humdSHT);
 
   int tempSize = std::string(tempBuffer).length()*12;

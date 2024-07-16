@@ -47,7 +47,7 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   char buffer[1024];
-  sprintf(buffer,"\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (°C) |(pct)| (°C) |(mbar)| (m) |(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+\n"); // Print header to terminal
+  sprintf(buffer,"\n\n+==============================================================================+\n|  TIME  | TEMP | HUM |  HI  | PRES | ALT | CO2 | TVOC |  AQI  |  UVI  |  LUX  |\n|hh:mm:ss| (C)  |(pct)| (C)  |(mbar)| (m) |(ppm)|(ppb.)| (1-5) |(0-+11)|(k-lux)|\n+==============================================================================+\n"); // Print header to terminal
   Serial.print(buffer);
 }
 

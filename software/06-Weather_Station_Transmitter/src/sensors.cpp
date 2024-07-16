@@ -1,6 +1,5 @@
 #include "setup.h"
 
-units unit;
 sensors sen;
 parameters param;
 configuration config;
@@ -54,90 +53,6 @@ configuration getConfig(void){
     Serial.print("\nCould not open config.json");
   }
   return config;
-}
-
-units getUnits(void){
-  if(!file.open("config.json", FILE_READ)){
-    Serial.print("\nFailed to open config.json or file does not exist");
-  }
-  if(file){
-    JsonDocument doc;
-    DeserializationError error = deserializeJson(doc, file);
-    if(error){
-      Serial.print("\nDeserializeJson() failed");
-      Serial.print(error.f_str());
-    }
-
-    unit.feet = doc["UNITS"]["ALTITUDE"]["FEET"] | false;
-    unit.meters = doc["UNITS"]["ALTITUDE"]["METERS"] | false;
-    unit.pascal = doc["UNITS"]["PRESSURE"]["PASCAL"] | false;
-    unit.mbar = doc["UNITS"]["PRESSURE"]["MBAR"] | false;
-    unit.kpa = doc["UNITS"]["PRESSURE"]["K_PASCAL"] | false;
-    unit.inhg = doc["UNITS"]["PRESSURE"]["IN_HG"] | false;
-    unit.mmhg = doc["UNITS"]["PRESSURE"]["MM_HG"] | false;
-    unit.psi = doc["UNITS"]["PRESSURE"]["PSI"] | false;
-    unit.celsius = doc["UNITS"]["TEMPERATURE"]["CELSIUS"] | false;
-    unit.fahrenheit = doc["UNITS"]["TEMPERATURE"]["FAHRENHEIT"] | false;
-    file.close();
-
-    if(unit.feet){
-      alt = "(ft.)";
-      alt_file = "(ft)";
-    }
-    else{
-      alt = " (m) ";
-      alt_file = "(m)";
-    }
-
-    if(unit.pascal){
-      pres = " (Pa) ";
-      pres_file = "(Pa)";
-      presDisp = "Pa";
-    }
-    else if(unit.mbar){
-      pres = "(mbar)";
-      pres_file = "(mbar)";
-      presDisp = "mbar";
-    }
-    else if(unit.kpa){
-      pres = "(kPa.)";
-      pres_file = "(kPa)";
-      presDisp = "kPa";
-    }
-    else if(unit.inhg){
-      pres = "(inHg)";
-      pres_file = "(inHg)";
-      presDisp = "inHg";
-    }
-    else if(unit.mmhg){
-      pres = "(mmHg)";
-      pres_file = "(mmHg)";
-      presDisp = "mmHg";
-    }
-    else if(unit.psi){
-      pres = "(Psi.)";
-      pres_file = "(psi)";
-      presDisp = "Psi";
-    }
-    else{}
-
-    if(unit.celsius){
-      temp = "(°C)";
-      temp_file = "(C)";
-      tempDisp = "C";
-    }
-    else{
-      temp = "(°F)";
-      temp_file = "(F)";
-      tempDisp = "F";
-    }
-
-  }
-  else{
-    Serial.print("\nCould not open config.json");
-  }
-
-  return unit;
 }
 
 sensors getSensors(void){
@@ -367,34 +282,6 @@ parameters getSensorData(sensors sen){
   }
   else{
     param.alsVEML = 0.0f;
-  }
-
-  //Unit conversions
-  if(unit.feet){
-    param.alt = param.alt * 0.0254/12;
-  }
-  if(unit.pascal){
-    param.pres = param.pres * 100;
-  }
-  else if(unit.kpa){
-    param.pres = param.pres * 0.1;
-  }
-  else if(unit.inhg){
-    param.pres = param.pres * 0.029529983071445;
-  }
-  else if(unit.mmhg){
-    param.pres = param.pres * 0.75006157584566;
-  }
-  else if(unit.psi){
-    param.pres = param.pres * 0.01450377;
-  }
-  else{}
-
-  if(unit.fahrenheit){
-    param.tempLPS = param.tempLPS*1.8+32;
-    param.tempSCD = param.tempSCD*1.8+32;
-    param.tempSHT = param.tempSHT*1.8+32;
-    param.heatIndex = param.heatIndex*1.8+32;
   }
 
   return param;
