@@ -1,0 +1,50 @@
+{
+  "STUDENT_NAME": "Name",
+  "REFRESH_RATE": 500,
+  "NETWORK": {
+    "SSID": "wifi",
+    "PASSWORD": "password"
+  },
+  "NEO_PIXEL": {
+    "RGB": {
+      "STS": true,
+      "RED": 100,
+      "GREEN": 20,
+      "BLUE": 30,
+      "BRIGHTNESS": 10
+    },
+    "HSV": {
+      "STS": false,
+      "HUE": 40,
+      "SATURATION": 50,
+      "VALUE": 50
+    }
+  },
+  "UNITS": {
+    "ALTITUDE": {
+      "FEET": false,
+      "METERS": true
+    },
+    "PRESSURE": {
+      "PASCAL": false,
+      "MBAR": true,
+      "K_PASCAL": false,
+      "IN_HG": false,
+      "MM_HG": false,
+      "PSI": false
+    },
+    "TEMPERATURE": {
+      "CELSIUS": true,
+      "FAHRENHEIT": false
+    }
+  },
+  "SENSORS": {
+    "ENS160": false,
+    "LPS22": true,
+    "LTR390": false,
+    "MAX17048": false,
+    "SCD40": false,
+    "SHT41": true,
+    "VEML7700": false
+  }
+}
