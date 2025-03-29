@@ -1,0 +1,464 @@
+(footprint "GRT0603"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "Capacitor, Chip; 1.60 mm L X 0.80 mm W X 0.88 mm H body")
+	(tags "0603; 1608")
+	(property "Reference" "REF**"
+		(at 0 -1.25 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "c05b2ebf-2627-49d9-b74c-3eb6a019b179")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "10uF"
+		(at 0 0 0)
+		(layer "User.1")
+		(hide yes)
+		(uuid "f2485752-bed7-408b-b69f-91c553bf8b3c")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.05)
+			)
+		)
+	)
+	(property "Datasheet" "datasheets/Murata-Electronics-GRM188R60J106KE47-02.pdf"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "9d96b822-03dc-4a95-8697-8746e657f3a5")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "CAP CER 10UF 6.3V X5R 0603"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "796284cc-13e8-4d64-8b11-74889994ce2b")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer" "Murata Electronics"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "95beeb51-d59f-43d9-a099-5d5dadcda458")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Tolerance" "10%"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "fa73e96b-a5e9-44af-8570-decc8b63cd25")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Voltage Rating" "6V3"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "2b5b7442-0a9f-437b-ac79-7cf35ba09be5")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Package" "0603"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "22bcadeb-16b4-48fa-bf4f-513a663ca49a")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "MPN" "GRM188R60J106KE47D"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "05145292-6ee7-40ad-94fd-717b302aa720")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "DKPN" "490-12538-1-ND"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "3e88a6da-53f1-4156-a1ef-9b9183e73177")
+		(effects
+			(font
+				(size 0.75 0.75)
+				(thickness 0.12)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -1.365 -0.665)
+		(end -0.455 -0.665)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "6cff3529-df74-483c-b4cf-cab0fa68e573")
+	)
+	(fp_line
+		(start -1.365 0.665)
+		(end -1.365 -0.665)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "314d9b10-ed3b-4295-8c1a-b3338d2dcf04")
+	)
+	(fp_line
+		(start -0.455 0.665)
+		(end -1.365 0.665)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "c99d676e-5af4-4099-89e9-4acccffac940")
+	)
+	(fp_line
+		(start 0.455 0.665)
+		(end 1.365 0.665)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "5c36444d-8943-4865-8cf4-014f67b13b52")
+	)
+	(fp_line
+		(start 1.365 -0.665)
+		(end 0.455 -0.665)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ae406dcd-4401-4f6f-98ad-5e3f80677d1e")
+	)
+	(fp_line
+		(start 1.365 0.665)
+		(end 1.365 -0.665)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "89a657d0-b8d9-4108-a23c-5954c8ff7309")
+	)
+	(fp_line
+		(start -0.8 -0.4)
+		(end -0.45 -0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "643ef05b-9bb4-46b2-8afd-dec023cedb42")
+	)
+	(fp_line
+		(start -0.8 -0.4)
+		(end 0.8 -0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "b2b2d427-9bca-498d-9a26-14e13d4a790d")
+	)
+	(fp_line
+		(start -0.8 0.4)
+		(end -0.8 -0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "8559985d-7821-420a-b42c-ba6f0517b862")
+	)
+	(fp_line
+		(start -0.8 0.4)
+		(end -0.8 -0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "efa13d09-5d54-494f-846c-1b5a915401a6")
+	)
+	(fp_line
+		(start -0.45 -0.4)
+		(end -0.45 0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "7429d42d-3076-4882-b878-55edb7e17bab")
+	)
+	(fp_line
+		(start -0.45 0.4)
+		(end -0.8 0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "725c39dd-b28c-47de-9bdb-5f696931dfa6")
+	)
+	(fp_line
+		(start 0.45 -0.4)
+		(end 0.8 -0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "9d078ff7-231c-40a1-9ae0-c2b06e6a745c")
+	)
+	(fp_line
+		(start 0.45 0.4)
+		(end 0.45 -0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "a32a2808-d711-4fdd-9e8b-c2aae8d03f2e")
+	)
+	(fp_line
+		(start 0.8 -0.4)
+		(end 0.8 0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "74ddbef9-ffb8-4caf-ac27-e7b436b720fc")
+	)
+	(fp_line
+		(start 0.8 -0.4)
+		(end 0.8 0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "90b52a40-0b83-49b9-b6f7-042e6ff5471b")
+	)
+	(fp_line
+		(start 0.8 0.4)
+		(end -0.8 0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "f504fcf0-fa58-4bb4-aed9-bbe3cca5b588")
+	)
+	(fp_line
+		(start 0.8 0.4)
+		(end 0.45 0.4)
+		(stroke
+			(width 0.025)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "272fece6-7cb0-4f50-8d21-be2a96149be7")
+	)
+	(fp_line
+		(start -1.425 -0.725)
+		(end 1.425 -0.725)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "acff3723-45bd-468f-9c21-85d0930869b4")
+	)
+	(fp_line
+		(start -1.425 0.725)
+		(end -1.425 -0.725)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "9851af83-833b-4fd5-ba80-21d44fd486d1")
+	)
+	(fp_line
+		(start 1.425 -0.725)
+		(end 1.425 0.725)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "47f9490d-2804-4773-9709-5c9af0d858bc")
+	)
+	(fp_line
+		(start 1.425 0.725)
+		(end -1.425 0.725)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "9a540fdb-ee62-4e55-a0f1-c58312b1186b")
+	)
+	(fp_line
+		(start -0.875 -0.475)
+		(end 0.875 -0.475)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "3af6b7df-063f-4837-b28f-64911ecef5ae")
+	)
+	(fp_line
+		(start -0.875 0.475)
+		(end -0.875 -0.475)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "3bea34d3-ad86-4e27-9136-44f88969ddd4")
+	)
+	(fp_line
+		(start 0 -0.35)
+		(end 0 0.35)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "2e15e4e9-5bd4-4316-8a75-61b168f4c07a")
+	)
+	(fp_line
+		(start 0.35 0)
+		(end -0.35 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "28530b12-0749-4d0b-b97f-1e6bbc0bc442")
+	)
+	(fp_line
+		(start 0.875 -0.475)
+		(end 0.875 0.475)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "2c3b82f8-024f-47f8-8a13-6ebbcc77c811")
+	)
+	(fp_line
+		(start 0.875 0.475)
+		(end -0.875 0.475)
+		(stroke
+			(width 0.15)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "40e26bf6-5401-4d16-8f50-bddb30681b40")
+	)
+	(fp_circle
+		(center 0 0)
+		(end 0.25 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "a0c2413d-c487-4620-a465-009cb7c7deb7")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "User.1")
+		(hide yes)
+		(uuid "ef443de9-81c4-4502-ba09-71d673772c6b")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.05)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -0.7 0)
+		(size 0.8 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "e32bb5c4-32bc-4334-bc57-812c8af0c673")
+	)
+	(pad "2" smd roundrect
+		(at 0.7 0)
+		(size 0.8 0.9)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.25)
+		(uuid "96548492-c067-4445-bff8-ccce2abae12f")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/3d_models/GRT188R71E105KE13D.STEP"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+)
