@@ -1,0 +1,3 @@
+[submodule "hardware/Weather-FeatherWing"]
+	path = hardware/Weather-FeatherWing
+	url = https://github.com/Destination-SPACE/Weather-FeatherWing.git
