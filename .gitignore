@@ -1,1 +1,15 @@
-/.vscode
+# West downloads - NEVER commit these
+.west/
+/zephyr/
+/modules/
+/bootloader/
+/tools/
+
+# Build artifacts
+build/
+**/build/
+build-*/
+
+# IDE
+.vscode/
+.idea/
