@@ -16,7 +16,8 @@
 		"cSpell.ignoreWords": [
 			"RTIO",
 			"printk",
-			"procpu"
+			"procpu",
+			"sysbuild"
 		]
 	}
 }
