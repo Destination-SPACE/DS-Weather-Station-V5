@@ -17,7 +17,9 @@
 			"RTIO",
 			"printk",
 			"procpu",
-			"sysbuild"
+			"sysbuild",
+			"venv",
+			"zephyrproject"
 		]
 	}
 }
