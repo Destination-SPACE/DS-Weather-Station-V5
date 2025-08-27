@@ -8,6 +8,15 @@
 		"cSpell.words": [
 			"Adafruit",
 			"Microcontroller",
+		],
+		"files.associations": {
+			"math.h": "c",
+			"kernel.h": "c"
+		},
+		"cSpell.ignoreWords": [
+			"RTIO",
+			"printk",
+			"procpu"
 		]
 	}
 }
