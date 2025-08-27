@@ -1,25 +1,15 @@
-# Root west.yml - manages Zephyr and dependencies
+# West manifest pointing to external Zephyr installation
 manifest:
+  # Don't download Zephyr - use existing installation
+  projects: []
+  
+  # Use external Zephyr base
   defaults:
-    remote: upstream
-
-  remotes:
-    - name: upstream
-      url-base: https://github.com/zephyrproject-rtos
-    - name: my-modules
-      url-base: https://github.com/your-org
-
-  projects:
-    - name: zephyr
-      remote: upstream
-      revision: v4.2.0  # Pin to specific version for stability
-      import: true
+    remote: local
     
-    # Optional: Add custom modules
-    # - name: my-sensor-drivers
-    #   remote: my-modules
-    #   revision: main
-    #   path: modules/sensors
+  remotes:
+    - name: local
+      url-base: file://
 
   self:
     path: .
