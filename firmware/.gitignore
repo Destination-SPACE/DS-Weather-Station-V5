@@ -1,0 +1,10 @@
+# Zephyr downloaded dependencies (DON'T commit these)
+/.west/
+/zephyr/
+/modules/
+/bootloader/
+/tools/
+
+# Build artifacts
+**/build/
+**/.west/

@@ -1,15 +1,13 @@
-# West downloads - NEVER commit these
-.west/
-/zephyr/
-/modules/
-/bootloader/
-/tools/
-
-# Build artifacts
-build/
-**/build/
-build-*/
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
 
 # IDE
-.vscode/
+.vscode/settings.json
 .idea/
+
+# OS
+.DS_Store
+Thumbs.db
