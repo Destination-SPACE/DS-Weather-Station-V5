@@ -16,9 +16,12 @@
 		"cSpell.ignoreWords": [
 			"RTIO",
 			"espressif",
+			"gpios",
 			"mcuboot",
 			"printk",
 			"procpu",
+			"sdhc",
+			"sdmmc",
 			"sysbuild",
 			"venv",
 			"zephyrproject"
