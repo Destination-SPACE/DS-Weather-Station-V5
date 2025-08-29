@@ -1,0 +1,53 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+        "label": "Build Zephyr App",
+        "type": "shell",
+        "command": "${workspaceFolder}/.vscode/build_zephyr.sh",
+        "args": [
+            "${input:zephyrApp}"
+        ],
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": [
+            "$gcc"
+        ],
+        "presentation": {
+            "reveal": "always"
+        }
+    },
+    {
+        "label": "Flash Zephyr App",
+        "type": "shell",
+        "command": "source .venv/bin/activate && cd firmware && west flash -d build/$(basename ${input:zephyrApp}) --esp-device ${input:flashPort}",
+        "dependsOn": "Build Zephyr App",
+        "options": {
+            "cwd": "${workspaceFolder}"
+        },
+        "presentation": {
+            "reveal": "always"
+        },
+        "problemMatcher": []
+    }
+],
+  "inputs": [
+    {
+        "id": "zephyrApp",
+        "type": "promptString",
+        "description": "Enter the path to the Zephyr app relative to workspace root",
+        "default": "apps/"
+    },
+    {
+        "id": "flashPort",
+        "type": "promptString",
+        "description": "Enter the serial port for flashing (e.g., /dev/ttyUSB0 or COM3)",
+        "default": "/dev/ttyACM0"
+    }
+  ]
+}
