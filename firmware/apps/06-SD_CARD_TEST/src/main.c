@@ -4,6 +4,7 @@
 #include <zephyr/fs/fs.h>
 #include <zephyr/fs/littlefs.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/printk.h>
 
 LOG_MODULE_REGISTER(main);
 
